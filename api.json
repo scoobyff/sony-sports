@@ -6,31 +6,28 @@
     "featured": true,
     "streams": [
       {
-        "name": "Willow ",
-        "image": "http://p-img.movetv.com/cms/images/b7c5841c82ec21c38cd43815c7c49791ae3bcc56.png",
+        "name": "Sony Ten 1",
+        "image": "https://brand-websites-prod.s3.ap-south-1.amazonaws.com/sony-sports-networks-live/channel_logos/Sony%20Sports%20TEN%201%20HD.png",
         "linkType": "external",
-        "link": "https://scoobystreamsv2.vercel.app/play2.html?id=willowbycricbuzz"
+        "link": "https://scoobysports.vercel.app/player/sonyten1"
       },
       {
-        "name": "Willow 2 HD",
-        "image": "https://p-img.movetv.com/1280x720/3dca399cce2d5ddec3993ae3dc351399.png",
+        "name": "Sony Liv",
+        "image": "https://cdn.freelogovectors.net/wp-content/uploads/2021/12/sonyliv-logo-freelogovectors.net_.png",
         "linkType": "external",
-        "link": "https://scoobystreamsv2.vercel.app/play2.html?id=willow2bycricbuzz"
+        "link": "https://scoobystar.vercel.app/st1hd"
+      },
+      {
+        "name": "BBC Sports",
+        "image": "https://raw.githubusercontent.com/scoobyff/tv-logos/main/misc/media/bbc-sport-hz.png",
+        "linkType": "external",
+        "link": "https://scoobysports.vercel.app/player/bbc"
       },
       {
         "name": "Willow Sports",
         "image": "http://p-img.movetv.com/1280x720/6cc66eec23429f8821491ce16bf5032c.png",
-        "linkType": "internal",
-        "type": "clearkey",
-        "url": "https://abmyxykaaaaaaaamkyvb65fuqebyg.7a77200bf98444ac997a89ed83775793.emt.cf.ww.aiv-cdn.net/iad-nitro/live/clients/dash/enc/f60kqesunw/out/v1/a435ed7a00f947deb4369b46d8f2fb70/cenc.mpd",
-        "k1": "1779c27b9d077a3ba0c9cc1bb9a94b9f",
-        "k2": "cc5cf3b7928fb9e0a1ee6a8b566f0a8e"
-      },
-      {
-        "name": "Live Scoreboard",
-        "image": "https://cdn-icons-png.flaticon.com/512/1483/1483336.png",
         "linkType": "external",
-        "link": "https://www.espncricinfo.com"
+        "link": "https://scoobysports.vercel.app/player/willowsports"
       }
     ]
   },
@@ -41,16 +38,40 @@
     "featured": true,
     "streams": [
       {
-        "name": "Willow HD",
-        "image": "http://p-img.movetv.com/cms/images/b7c5841c82ec21c38cd43815c7c49791ae3bcc56.png",
+        "name": "Sony Ten 1",
+        "image": "https://brand-websites-prod.s3.ap-south-1.amazonaws.com/sony-sports-networks-live/channel_logos/Sony%20Sports%20TEN%201%20HD.png",
         "linkType": "external",
-        "link": "https://scoobystreamsv2.vercel.app/play2.html?id=willowbycricbuzz"
+        "link": "https://scoobysports.vercel.app/player/sonyten1"
       },
       {
-        "name": "Willow 2 HD",
-        "image": "https://p-img.movetv.com/1280x720/3dca399cce2d5ddec3993ae3dc351399.png",
+        "name": "Sony Ten 3 Hindi",
+        "image": "https://brand-websites-prod.s3.ap-south-1.amazonaws.com/sony-sports-networks-live/channel_logos/Sony%20Sports%20TEN%203%20Hindi%20HD.png",
         "linkType": "external",
-        "link": "https://scoobystreamsv2.vercel.app/play2.html?id=willow2bycricbuzz"
+        "link": "https://scoobysports.vercel.app/player/sonyten3"
+      },
+      {
+        "name": "Sony Liv English",
+        "image": "https://cdn.freelogovectors.net/wp-content/uploads/2021/12/sonyliv-logo-freelogovectors.net_.png",
+        "linkType": "external",
+        "link": "https://scoobystar.vercel.app/st1hd"
+      },
+      {
+        "name": "Sony Liv Hindi",
+        "image": "https://cdn.freelogovectors.net/wp-content/uploads/2021/12/sonyliv-logo-freelogovectors.net_.png",
+        "linkType": "external",
+        "link": "https://scoobystar.vercel.app/st3hd"
+      },
+      {
+        "name": "BBC Sports",
+        "image": "https://raw.githubusercontent.com/scoobyff/tv-logos/main/misc/media/bbc-sport-hz.png",
+        "linkType": "external",
+        "link": "https://scoobysports.vercel.app/player/bbc"
+      },
+      {
+        "name": "Willow Sports",
+        "image": "http://p-img.movetv.com/1280x720/6cc66eec23429f8821491ce16bf5032c.png",
+        "linkType": "external",
+        "link": "https://scoobysports.vercel.app/player/willowsports"
       }
     ]
   },
