@@ -6,9 +6,10 @@
   <title>Player - Superman Live</title>
   <script src="https://content.jwplatform.com/libraries/IDzF9Zmk.js"></script>
   <style>
-    html, body { margin: 0; height: 100%; background: #000; }
-    #myElement { width: 100%; height: 100%; }
-    #error-message { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 22px; background: rgba(0,0,0,0.8); padding: 20px; border-radius: 8px; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { font-family: Arial, sans-serif; background-color: #000; overflow: hidden; width: 100%; height: 100%; }
+    #myElement { position: absolute; width: 100%; height: 100%; }
+    #error-message { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 22px; text-align: center; padding: 20px; background-color: rgba(0,0,0,0.8); border-radius: 8px; z-index: 1000; }
   </style>
 </head>
 <body>
@@ -29,12 +30,12 @@
     if (!channelName) {
       showError('No channel specified!');
     } else {
-      fetch(`api.json?nocache=${Date.now()}`)
-        .then(r => r.json())
+      fetch('api.json')
+        .then(res => res.json())
         .then(data => {
           const channel = data.find(item => item.name.toLowerCase() === channelName.toLowerCase() && item.linkType === 'internal');
           if (!channel) {
-            showError('Channel not found or external only!');
+            showError('Channel not found or not playable internally!');
             return;
           }
           const player = jwplayer("myElement");
@@ -46,7 +47,11 @@
             hlshtml: true,
             aspectratio: "16:9",
             controls: true,
-            responsive: true
+            responsive: true,
+            logo: {
+              file: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Superman_shield.svg/640px-Superman_shield.svg.png",
+              hide: true
+            }
           };
           if (channel.type === "clearkey") {
             opts.file = channel.url;
@@ -61,31 +66,6 @@
         })
         .catch(() => showError('Error loading channel.'));
     }
-  </script>
-
-  <!-- Updated telegram.js integration -->
-  <script src="telegram.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      // Start tracking when player loads
-      if (channelName) {
-        startWatchTimer(channelName);
-      }
-      
-      // Stop tracking when user leaves
-      window.addEventListener("beforeunload", () => {
-        stopWatchTimer();
-      });
-      
-      // Also track page visibility changes
-      document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-          stopWatchTimer();
-        } else if (channelName) {
-          startWatchTimer(channelName);
-        }
-      });
-    });
   </script>
 </body>
 </html>
