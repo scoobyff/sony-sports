@@ -12,11 +12,14 @@
     main { flex: 1; }
     .platform-card { transition: transform 0.3s ease, box-shadow 0.3s ease; background: linear-gradient(145deg, #181818, #2a2a2a); border-radius: 0.75rem; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
     .platform-card:hover { transform: translateY(-6px) scale(1.04); box-shadow: 0 12px 25px rgba(220, 38, 38, 0.25), 0 6px 15px rgba(0, 0, 0, 0.4); }
-    .platform-card img { transition: transform 0.3s ease-in-out; }
+    .platform-card img { transition: transform 0.3s ease-in-out; max-width: 100%; max-height: 100%; object-fit: contain; }
     .platform-card:hover img { transform: scale(1.08); }
     .gradient-text { background: linear-gradient(45deg, #ff3131, #ffb347, #ff3131); -webkit-background-clip: text; background-clip: text; color: transparent; }
     footer { background: #141414; padding: 2rem 1rem; text-align: center; border-top: 1px solid #222; }
     .logo { width: 42px; height: 42px; border-radius: 8px; padding: 6px; background: linear-gradient(145deg, #1e3a8a, #dc2626); }
+    .image-container { width: 100%; height: 120px; background: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .featured-image { width: 100%; height: 200px; background: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .featured-image img { max-width: 100%; max-height: 100%; object-fit: cover; }
   </style>
 </head>
 <body>
@@ -31,7 +34,7 @@
 
   <!-- Main -->
   <main class="container mx-auto px-4 py-8" id="platforms-container">
-    <!-- JS will load content -->
+    <div class="text-center py-20 text-gray-300">Loading platforms...</div>
   </main>
 
   <!-- Footer -->
@@ -45,73 +48,121 @@
   <script>
     const container = document.getElementById('platforms-container');
 
-    fetch(`api.json?nocache=${Date.now()}`)
-      .then(r => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json();
-      })
-      .then(data => {
-        if (!Array.isArray(data) || data.length === 0) {
-          container.innerHTML = `<div class="text-center py-20 text-gray-300">No platforms available</div>`;
-          return;
-        }
+    // Load platforms with proper error handling
+    function loadPlatforms() {
+      fetch(`api.json?nocache=${Date.now()}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('API data loaded:', data);
+          
+          if (!Array.isArray(data)) {
+            throw new Error('API response is not an array');
+          }
+          
+          if (data.length === 0) {
+            container.innerHTML = `<div class="text-center py-20 text-yellow-500">No platforms configured yet</div>`;
+            return;
+          }
 
-        const featured = data.find(item => item.featured);
-        let featuredHTML = '';
-        if (featured) {
-          const isExternal = featured.linkType === "external";
-          const linkUrl = isExternal ? featured.link : `play.html?name=${encodeURIComponent(featured.name)}`;
-          featuredHTML = `
-            <section class="mb-8">
-              <a href="${linkUrl}" ${isExternal ? `target="_blank" onclick="trackExternalPlayer('${featured.name}')"` : ''} 
-                 class="block bg-gradient-to-r from-red-700 to-orange-600 rounded-lg shadow-lg overflow-hidden hover:scale-[1.02]">
-                <div class="flex flex-col sm:flex-row">
-                  <div class="w-full sm:w-1/3 bg-black">
-                    <img src="${featured.image}" alt="${featured.name}" class="w-full h-full object-cover">
+          // Find featured item
+          const featured = data.find(item => item.featured === true);
+          let featuredHTML = '';
+          
+          if (featured) {
+            const isExternal = featured.linkType === "external";
+            const linkUrl = isExternal ? featured.link : `play.html?name=${encodeURIComponent(featured.name)}`;
+            const imageUrl = featured.image || 'https://via.placeholder.com/300x200/333/fff?text=No+Image';
+            
+            featuredHTML = `
+              <section class="mb-8">
+                <a href="${linkUrl}" ${isExternal ? `target="_blank" onclick="trackExternalPlayer('${featured.name.replace(/'/g, '\\\'')}')"` : ''} 
+                   class="block bg-gradient-to-r from-red-700 to-orange-600 rounded-lg shadow-lg overflow-hidden hover:scale-[1.02] transition-transform">
+                  <div class="flex flex-col sm:flex-row">
+                    <div class="w-full sm:w-1/3 featured-image">
+                      <img src="${imageUrl}" alt="${featured.name}" onerror="this.src='https://via.placeholder.com/300x200/333/fff?text=${encodeURIComponent(featured.name)}'">
+                    </div>
+                    <div class="flex-1 p-4">
+                      <h2 class="text-xl font-bold">${featured.name}</h2>
+                      <p class="text-gray-300 mt-2">Featured - Click to watch now</p>
+                      <div class="mt-2">
+                        <span class="inline-block px-2 py-1 bg-red-600 text-xs rounded">FEATURED</span>
+                      </div>
+                    </div>
                   </div>
-                  <div class="flex-1 p-4">
-                    <h2 class="text-xl font-bold">${featured.name}</h2>
-                    <p class="text-gray-300 mt-2">Click to watch now.</p>
-                  </div>
-                </div>
-              </a>
-            </section>
-          `;
-        }
+                </a>
+              </section>
+            `;
+          }
 
-        const cards = data
-          .filter(item => !item.featured)
-          .map(platform => {
+          // Create regular platform cards
+          const regularPlatforms = data.filter(item => !item.featured);
+          const cards = regularPlatforms.map(platform => {
             const isExternal = platform.linkType === "external";
             const linkUrl = isExternal ? platform.link : `play.html?name=${encodeURIComponent(platform.name)}`;
+            const imageUrl = platform.image || 'https://via.placeholder.com/150x120/333/fff?text=No+Image';
+            
             return `
               <article class="platform-card w-full max-w-[160px]">
-                <div class="aspect-video bg-black flex items-center justify-center">
-                  <img src="${platform.image}" alt="${platform.name}" class="max-w-[70%] max-h-[70%] p-2">
+                <div class="image-container">
+                  <img src="${imageUrl}" alt="${platform.name}" 
+                       onerror="this.src='https://via.placeholder.com/150x120/333/fff?text=${encodeURIComponent(platform.name)}'">
                 </div>
                 <div class="p-3 space-y-2">
-                  <h2 class="text-sm font-semibold truncate">${platform.name}</h2>
-                  <a href="${linkUrl}" ${isExternal ? `target="_blank" onclick="trackExternalPlayer('${platform.name}')"` : ''} 
-                     class="w-full inline-flex items-center justify-center bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-3 py-1.5 rounded-md text-xs font-medium">
-                    <i class="fas fa-play text-xs"></i><span>Watch</span>
+                  <h2 class="text-sm font-semibold truncate" title="${platform.name}">${platform.name}</h2>
+                  <a href="${linkUrl}" 
+                     ${isExternal ? `target="_blank" onclick="trackExternalPlayer('${platform.name.replace(/'/g, '\\\'')}')"` : ''} 
+                     class="w-full inline-flex items-center justify-center space-x-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-3 py-1.5 rounded-md text-xs font-medium transition-all">
+                    <i class="fas fa-play text-xs"></i>
+                    <span>${isExternal ? 'Open' : 'Watch'}</span>
                   </a>
                 </div>
               </article>
             `;
           }).join('');
 
-        container.innerHTML = featuredHTML + `<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">${cards}</div>`;
-      })
-      .catch(err => {
-        container.innerHTML = `<div class="text-center py-20 text-red-500">Error loading data: ${err.message}</div>`;
-      });
+          // Update container
+          const gridHTML = cards ? `<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">${cards}</div>` : '';
+          container.innerHTML = featuredHTML + gridHTML;
+          
+          if (regularPlatforms.length === 0 && !featured) {
+            container.innerHTML += `<div class="text-center py-10 text-gray-400">No platforms available</div>`;
+          }
+        })
+        .catch(error => {
+          console.error('Error loading platforms:', error);
+          container.innerHTML = `
+            <div class="text-center py-20">
+              <div class="text-red-500 text-lg mb-2">⚠️ Error Loading Platforms</div>
+              <div class="text-gray-400 text-sm mb-4">${error.message}</div>
+              <button onclick="loadPlatforms()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+                Try Again
+              </button>
+            </div>
+          `;
+        });
+    }
+
+    // Global function for tracking external clicks
+    window.trackExternalPlayer = function(name) {
+      if (typeof trackExternalPlayer === 'function') {
+        trackExternalPlayer(name);
+      }
+    };
+
+    // Load platforms when page loads
+    loadPlatforms();
   </script>
 
-  <!-- Updated telegram.js integration -->
+  <!-- Load telegram.js -->
   <script src="telegram.js"></script>
   <script>
-    // Initialize with updated telegram.js functions
     document.addEventListener("DOMContentLoaded", () => {
+      // Check for maintenance and broadcasts
       checkMaintenanceStatus('maintenance.json');
       checkBroadcast('broadcast.json');
     });
