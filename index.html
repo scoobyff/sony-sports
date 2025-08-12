@@ -107,10 +107,14 @@
       });
   </script>
 
+  <!-- Updated telegram.js integration -->
   <script src="telegram.js"></script>
   <script>
-    checkMaintenanceStatus('maintenance.json');
-    checkBroadcast('broadcast.json');
+    // Initialize with updated telegram.js functions
+    document.addEventListener("DOMContentLoaded", () => {
+      checkMaintenanceStatus('maintenance.json');
+      checkBroadcast('broadcast.json');
+    });
   </script>
 </body>
 </html>
