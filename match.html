@@ -12,7 +12,7 @@
 <script>
 const params = new URLSearchParams(window.location.search);
 const matchName = params.get("name");
-fetch(`scooby.json?nocache=${Date.now()}`)
+fetch(`https://raw.githubusercontent.com/scoobyff/sony-sports/refs/heads/main/scooby.json?nocache=${Date.now()}`)
   .then(res => res.json())
   .then(data => {
     const match = data.find(m => m.name === matchName);
