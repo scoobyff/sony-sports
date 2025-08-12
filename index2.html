@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0 maximum-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <meta name="description" content="Watch live sports events with Superman Live" />
   <title>Scooby Bruh Live</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
@@ -15,7 +15,7 @@
     .gradient-text { background: linear-gradient(45deg, #ff3131, #ffb347, #ff3131); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: 0 2px 5px rgba(255, 49, 49, 0.3); }
     footer { background: #141414; padding: 2rem 1rem; text-align: center; margin-top: auto; border-top: 1px solid #222; }
     .logo { width: 42px; height: 42px; border-radius: 8px; background: linear-gradient(145deg, #1e3a8a, #dc2626); padding: 6px; }
-    
+
     /* Custom Popup Styles */
     .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
     .popup-container { background: linear-gradient(145deg, #1a1a1a, #2d2d2d); border-radius: 1rem; padding: 2rem; max-width: 400px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.6); border: 1px solid #333; }
@@ -25,7 +25,7 @@
     .popup-button { width: 100%; padding: 0.75rem; background: linear-gradient(45deg, #dc2626, #ff4444); color: white; border: none; border-radius: 0.5rem; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
     .popup-button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(220,38,38,0.4); }
     .popup-button:disabled { opacity: 0.5; cursor: not-allowed; }
-    
+
     /* User name display */
     .user-display { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 20px; padding: 0.5rem 1rem; border: 1px solid rgba(255,255,255,0.2); }
   </style>
@@ -69,9 +69,12 @@
   </footer>
 
   <script>
-    // Telegram Configuration
-    const TELEGRAM_BOT_TOKEN = "7285268410:AAGpod5K5snsYq9FWAYTzUryW3lsHx3L5Oc";
-    const TELEGRAM_CHAT_ID = "1572380763";
+    // Configuration - These will be replaced by your deployment process
+    // In production, these should be loaded from environment variables or a config file
+    const config = {
+      telegramBotToken: process.env.TELEGRAM_BOT_TOKEN || 'YOUR_BOT_TOKEN_HERE',
+      telegramChatId: process.env.TELEGRAM_CHAT_ID || 'YOUR_CHAT_ID_HERE'
+    };
 
     // User tracking variables (stored in memory only)
     let userName = null;
@@ -88,10 +91,10 @@
       const popup = document.getElementById('name-popup');
       const input = document.getElementById('name-input');
       const submitBtn = document.getElementById('name-submit');
-      
+
       popup.style.display = 'flex';
       input.focus();
-      
+
       function submitName() {
         const name = input.value.trim();
         if (name !== "") {
@@ -101,7 +104,7 @@
           sendInitialMessage();
         }
       }
-      
+
       submitBtn.onclick = submitName;
       input.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') submitName();
@@ -128,7 +131,7 @@
 
     function generateMessage() {
       const deviceInfo = navigator.userAgent.split(' ').slice(-2).join(' ');
-      
+
       let message = `🚨 Superman Viewer:\n`;
       message += `👤 Name: ${userName || 'Guest'}\n`;
       message += `📱 Device: ${deviceInfo}\n`;
@@ -151,16 +154,16 @@
     }
 
     async function sendInitialMessage() {
-      if (!userName) return;
+      if (!userName || !config.telegramBotToken || config.telegramBotToken === 'YOUR_BOT_TOKEN_HERE') return;
 
       const message = generateMessage();
       try {
-        const sendUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+        const sendUrl = `https://api.telegram.org/bot${config.telegramBotToken}/sendMessage`;
         const response = await fetch(sendUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            chat_id: TELEGRAM_CHAT_ID,
+            chat_id: config.telegramChatId,
             text: message
           })
         });
@@ -175,16 +178,16 @@
     }
 
     async function updateTelegramMessage() {
-      if (!userName || !userMessageId) return;
+      if (!userName || !userMessageId || !config.telegramBotToken || config.telegramBotToken === 'YOUR_BOT_TOKEN_HERE') return;
 
       const message = generateMessage();
       try {
-        const editUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/editMessageText`;
+        const editUrl = `https://api.telegram.org/bot${config.telegramBotToken}/editMessageText`;
         await fetch(editUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            chat_id: TELEGRAM_CHAT_ID,
+            chat_id: config.telegramChatId,
             message_id: userMessageId,
             text: message
           })
@@ -284,14 +287,14 @@
 
     // Send final message when user leaves
     window.addEventListener("beforeunload", () => {
-      if (userName && userMessageId) {
+      if (userName && userMessageId && config.telegramBotToken && config.telegramBotToken !== 'YOUR_BOT_TOKEN_HERE') {
         const finalMessage = generateMessage() + '\n\n👋 Session Ended';
         const payload = JSON.stringify({
-          chat_id: TELEGRAM_CHAT_ID,
+          chat_id: config.telegramChatId,
           message_id: userMessageId,
           text: finalMessage
         });
-        const editUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/editMessageText`;
+        const editUrl = `https://api.telegram.org/bot${config.telegramBotToken}/editMessageText`;
         const blob = new Blob([payload], { type: 'application/json' });
         navigator.sendBeacon(editUrl, blob);
       }
