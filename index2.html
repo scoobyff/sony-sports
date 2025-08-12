@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0 maximum-scale=1.0" />
   <meta name="description" content="Watch live sports events with Superman Live" />
   <title>Scooby Bruh Live</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
@@ -151,7 +151,7 @@
     }
 
     async function sendInitialMessage() {
-      if (!userName || !TELEGRAM_BOT_TOKEN) return;
+      if (!userName) return;
 
       const message = generateMessage();
       try {
@@ -175,7 +175,7 @@
     }
 
     async function updateTelegramMessage() {
-      if (!userName || !userMessageId || !TELEGRAM_BOT_TOKEN) return;
+      if (!userName || !userMessageId) return;
 
       const message = generateMessage();
       try {
@@ -197,7 +197,7 @@
     // Load platforms and setup click tracking
     const container = document.getElementById('platforms-container');
 
-    fetch(`https://raw.githubusercontent.com/scoobyff/sony-sports/main/scooby.json?nocache=${Date.now()}`)
+    fetch(`api.json?nocache=${Date.now()}`)
       .then(res => res.json())
       .then(data => {
         if (!Array.isArray(data) || data.length === 0) {
@@ -284,7 +284,7 @@
 
     // Send final message when user leaves
     window.addEventListener("beforeunload", () => {
-      if (userName && userMessageId && TELEGRAM_BOT_TOKEN) {
+      if (userName && userMessageId) {
         const finalMessage = generateMessage() + '\n\n👋 Session Ended';
         const payload = JSON.stringify({
           chat_id: TELEGRAM_CHAT_ID,
