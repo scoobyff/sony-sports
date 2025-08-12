@@ -65,19 +65,19 @@
         "image": "https://upload.wikimedia.org/wikipedia/en/thumb/6/6c/FanCode_logo.svg/1200px-FanCode_logo.svg.png",
         "linkType": "external",
         "link": "https://scoobyfancode.vercel.app/play.html?id=132768"
-   },
-   {
+      },
+      {
         "name": "Sony Ten 4 Telugu",
         "image": "https://brand-websites-prod.s3.ap-south-1.amazonaws.com/sony-sports-networks-live/channel_logos/Sony%20Sports%20TEN%204%20Telugu.png",
         "linkType": "external",
         "link": "https://scoobysports.vercel.app/player/sonyten4"
-   },
-   {
+      },
+      {
         "name": "Sony Ten 5 English",
         "image": "https://brand-websites-prod.s3.ap-south-1.amazonaws.com/sony-sports-networks-live/channel_logos/Sony%20Sports%20TEN%205%20HD.png",
         "linkType": "external",
         "link": "https://scoobysports.vercel.app/player/sonyten5"
-   }
-  ]
- }
+      }
+    ]
+  }
 ]
