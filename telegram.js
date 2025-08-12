@@ -1,4 +1,4 @@
-// telegram.js - Updated for single message per user
+// telegram.js - Fixed version with rate limiting
 const TELEGRAM_BOT_TOKEN = "7285268410:AAGpod5K5snsYq9FWAYTzUryW3lsHx3L5Oc";
 const TELEGRAM_CHAT_ID = "1572380763";
 
@@ -10,6 +10,12 @@ let watchHistory = JSON.parse(localStorage.getItem("watchHistory") || "[]");
 let externalClicks = JSON.parse(localStorage.getItem("externalClicks") || "[]");
 let adClicks = JSON.parse(localStorage.getItem("adClicks") || "[]");
 let sessionStartTime = localStorage.getItem("sessionStartTime") || new Date().toLocaleString();
+
+// Rate limiting variables
+let lastUpdateTime = 0;
+let pendingUpdate = false;
+let updateTimeout = null;
+const UPDATE_COOLDOWN = 2000; // 2 seconds minimum between updates
 
 // Helpers
 function formatTime(seconds) {
@@ -25,9 +31,8 @@ function showNamePopup() {
   if (name && name.trim() !== "") {
     userName = name.trim();
     localStorage.setItem("userName", userName);
-    // Clear previous session data for new user
-    userMessageId = null;
-    localStorage.removeItem("userMessageId");
+    // Only send initial message, don't flood
+    scheduleUpdate();
   }
 }
 
@@ -51,6 +56,7 @@ function startWatchTimer(streamName) {
     duration: 0
   });
   saveToLocalStorage();
+  scheduleUpdate();
 }
 
 function stopWatchTimer() {
@@ -62,18 +68,19 @@ function stopWatchTimer() {
   watchHistory[watchHistory.length - 1].duration = duration;
   watchStartTime = null;
   saveToLocalStorage();
+  scheduleUpdate();
 }
 
 function trackExternalPlayer(name) {
   externalClicks.push({ name, time: new Date().toLocaleString() });
   saveToLocalStorage();
-  updateTelegramMessage();
+  scheduleUpdate();
 }
 
 function trackAdClick(adName) {
   adClicks.push({ adName, time: new Date().toLocaleString() });
   saveToLocalStorage();
-  updateTelegramMessage();
+  scheduleUpdate();
 }
 
 function checkMaintenanceStatus(url) {
@@ -91,58 +98,85 @@ function checkBroadcast(url) {
 }
 
 function generateMessage() {
-  stopWatchTimer(); // Update current session if watching
-  const deviceInfo = navigator.userAgent.split(' ').slice(-2).join(' '); // Shortened device info
-  const currentStatus = watchStartTime ? `🔴 Currently watching: ${watchHistory[watchHistory.length - 1]?.name}` : `⚫ Idle`;
-  
-  let message = `👤 User: ${userName || 'Guest'}\n`;
-  message += `📱 Device: ${deviceInfo}\n`;
-  message += `🕐 Session Start: ${sessionStartTime}\n`;
-  message += `📊 Status: ${currentStatus}\n`;
-  message += `⏱️ Total Watch Time: ${formatTime(totalWatchSeconds)}\n\n`;
+  if (watchStartTime && watchHistory.length > 0) {
+    const now = Date.now();
+    const currentDuration = Math.floor((now - watchStartTime) / 1000);
+    watchHistory[watchHistory.length - 1].duration = currentDuration;
+  }
 
-  // Recent watch history (last 5)
-  const recentHistory = watchHistory.slice(-5);
-  if (recentHistory.length > 0) {
-    message += `📺 Recent Streams (${recentHistory.length}/${watchHistory.length}):\n`;
-    recentHistory.forEach((w, i) => {
-      const status = w.end ? '✅' : '🔴';
+  const deviceInfo = navigator.userAgent.split(' ').slice(-2).join(' ');
+  const currentStatus = watchStartTime ? `🔴 Watching: ${watchHistory[watchHistory.length - 1]?.name}` : `⚫ Idle`;
+  
+  let message = `🚨 Superman Viewer:\n`;
+  message += `👤 Name: ${userName || 'Guest'}\n`;
+  message += `📱 Device: ${deviceInfo}\n`;
+  message += `🕐 Login: ${sessionStartTime}\n`;
+  message += `📊 Status: ${currentStatus}\n\n`;
+
+  if (watchHistory.length > 0) {
+    message += `📺 Watch History (${watchHistory.length}):\n`;
+    const recent = watchHistory.slice(-3);
+    recent.forEach((w) => {
+      const status = w.end || !watchStartTime ? '✅' : '🔴';
       message += `${status} ${w.name} (${formatTime(w.duration)})\n`;
     });
   } else {
-    message += `📺 No streams watched yet\n`;
+    message += `📺 No streams watched\n`;
   }
 
-  // Recent external clicks (last 3)
-  const recentExternal = externalClicks.slice(-3);
-  if (recentExternal.length > 0) {
-    message += `\n🔗 External Clicks (${recentExternal.length}/${externalClicks.length}):\n`;
-    recentExternal.forEach((c) => {
-      message += `• ${c.name}\n`;
-    });
+  if (externalClicks.length > 0) {
+    message += `\n🔗 External Clicks (${externalClicks.length})\n`;
   }
 
-  // Recent ad clicks (last 3)
-  const recentAds = adClicks.slice(-3);
-  if (recentAds.length > 0) {
-    message += `\n📢 Ad Clicks (${recentAds.length}/${adClicks.length}):\n`;
-    recentAds.forEach((a) => {
-      message += `• ${a.adName}\n`;
-    });
+  if (adClicks.length > 0) {
+    message += `📢 Ad Clicks (${adClicks.length})\n`;
   }
 
-  message += `\n🔄 Last Updated: ${new Date().toLocaleString()}`;
+  const totalTime = totalWatchSeconds + (watchStartTime ? Math.floor((Date.now() - watchStartTime) / 1000) : 0);
+  message += `\n⏱️ Total: ${formatTime(totalTime)}`;
+  message += `\n🔄 ${new Date().toLocaleTimeString()}`;
+  
   return message;
 }
 
-async function updateTelegramMessage() {
+// Rate-limited update function
+function scheduleUpdate() {
   if (!userName) return;
+  
+  const now = Date.now();
+  
+  // Clear any existing timeout
+  if (updateTimeout) {
+    clearTimeout(updateTimeout);
+    updateTimeout = null;
+  }
+  
+  // Check if we need to wait
+  const timeSinceLastUpdate = now - lastUpdateTime;
+  
+  if (timeSinceLastUpdate >= UPDATE_COOLDOWN) {
+    // Can update immediately
+    updateTelegramMessage();
+  } else {
+    // Schedule update after cooldown
+    const delay = UPDATE_COOLDOWN - timeSinceLastUpdate;
+    updateTimeout = setTimeout(() => {
+      updateTelegramMessage();
+      updateTimeout = null;
+    }, delay);
+  }
+}
 
+async function updateTelegramMessage() {
+  if (!userName || pendingUpdate) return;
+  
+  pendingUpdate = true;
+  lastUpdateTime = Date.now();
+  
   const message = generateMessage();
   
   try {
     if (userMessageId) {
-      // Update existing message
       const editUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/editMessageText`;
       const response = await fetch(editUrl, {
         method: 'POST',
@@ -155,15 +189,15 @@ async function updateTelegramMessage() {
       });
 
       if (!response.ok) {
-        console.log('Failed to edit message, creating new one...');
         await createNewMessage(message);
       }
     } else {
-      // Create new message
       await createNewMessage(message);
     }
   } catch (error) {
-    console.log('Error updating Telegram message:', error);
+    console.log('Telegram error:', error);
+  } finally {
+    pendingUpdate = false;
   }
 }
 
@@ -183,101 +217,36 @@ async function createNewMessage(message) {
       const data = await response.json();
       userMessageId = data.result.message_id;
       localStorage.setItem("userMessageId", userMessageId);
-      console.log('New Telegram message created with ID:', userMessageId);
     }
   } catch (error) {
-    console.log('Error creating new Telegram message:', error);
+    console.log('Message creation error:', error);
   }
 }
 
-// Update message periodically while user is active
-let updateInterval = null;
-
-function startPeriodicUpdates() {
-  if (updateInterval) return;
+function sendSummary() {
+  if (!userName || !userMessageId) return;
   
-  updateInterval = setInterval(() => {
-    if (userName && (watchStartTime || document.hasFocus())) {
-      updateTelegramMessage();
-    }
-  }, 30000); // Update every 30 seconds when active
-}
-
-function stopPeriodicUpdates() {
-  if (updateInterval) {
-    clearInterval(updateInterval);
-    updateInterval = null;
-  }
-}
-
-// Final update on page unload
-function sendFinalUpdate() {
-  stopWatchTimer();
-  const message = generateMessage();
+  const finalMessage = generateMessage() + '\n\n👋 Session Ended';
   
   const payload = JSON.stringify({
     chat_id: TELEGRAM_CHAT_ID,
     message_id: userMessageId,
-    text: message + '\n\n👋 Session Ended'
+    text: finalMessage
   });
 
-  if (userMessageId) {
-    const editUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/editMessageText`;
-    const blob = new Blob([payload], { type: 'application/json' });
-    navigator.sendBeacon(editUrl, blob);
-  }
+  const editUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/editMessageText`;
+  const blob = new Blob([payload], { type: 'application/json' });
+  navigator.sendBeacon(editUrl, blob);
 }
 
-// Event listeners
+// Removed auto-update interval - only update on user actions
 document.addEventListener("DOMContentLoaded", () => {
-  showNamePopup();
-  
   if (!sessionStartTime) {
     sessionStartTime = new Date().toLocaleString();
     localStorage.setItem("sessionStartTime", sessionStartTime);
   }
   
-  // Initial message update
-  if (userName) {
-    updateTelegramMessage();
-    startPeriodicUpdates();
-  }
+  showNamePopup();
   
-  // Start periodic updates when user provides name
-  const originalShowNamePopup = showNamePopup;
-  showNamePopup = function() {
-    originalShowNamePopup();
-    if (userName && !updateInterval) {
-      updateTelegramMessage();
-      startPeriodicUpdates();
-    }
-  };
-  
-  // Handle page visibility changes
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-      updateTelegramMessage();
-      stopPeriodicUpdates();
-    } else {
-      startPeriodicUpdates();
-    }
-  });
-  
-  // Final update on page unload
-  window.addEventListener("beforeunload", sendFinalUpdate);
-  window.addEventListener("pagehide", sendFinalUpdate);
+  window.addEventListener("beforeunload", sendSummary);
 });
-
-// Also update when user starts/stops watching
-const originalStartWatchTimer = startWatchTimer;
-const originalStopWatchTimer = stopWatchTimer;
-
-startWatchTimer = function(streamName) {
-  originalStartWatchTimer(streamName);
-  updateTelegramMessage();
-};
-
-stopWatchTimer = function() {
-  originalStopWatchTimer();
-  updateTelegramMessage();
-};
