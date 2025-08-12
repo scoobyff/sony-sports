@@ -25,11 +25,11 @@ fetch(`api.json?nocache=${Date.now()}`)
       let linkUrl = "#";
       if (s.linkType === "external") linkUrl = s.link;
       else if (s.linkType === "internal") linkUrl = `play.html?${new URLSearchParams(s).toString()}`;
-      return `<article class="platform-card w-full max-w-[160px] bg-gray-900 rounded-lg overflow-hidden">
-        <div class="aspect-video flex items-center justify-center bg-black">
+      return `<article class="platform-card w-full h-[200px] bg-gray-900 rounded-lg overflow-hidden flex flex-col">
+        <div class="aspect-video flex items-center justify-center bg-black flex-grow">
           <img src="${s.image}" alt="${s.name}" class="max-w-[70%] max-h-[70%] object-contain p-2">
         </div>
-        <div class="p-3 space-y-2">
+        <div class="p-3 space-y-2 flex flex-col justify-between flex-shrink-0">
           <h2 class="text-sm font-semibold truncate">${s.name}</h2>
           <a href="${linkUrl}" ${s.linkType==="external" ? 'target="_blank"' : ''} 
             class="block text-center bg-gradient-to-r from-red-600 to-red-700 text-white px-3 py-1.5 rounded-md text-xs font-medium">
