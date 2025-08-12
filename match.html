@@ -8,20 +8,18 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
   <style>
     body { background: #0d0d0d; color: #fff; font-family: 'Segoe UI', system-ui, sans-serif; }
-    .stream-card {
-      width: 140px;
-      flex-shrink: 0;
-    }
-    .stream-card .image-container {
-      width: 100%;
-      aspect-ratio: 1 / 1;
+    .logo-box {
+      width: 120px;
+      height: 120px;
       background: #000;
       display: flex;
       align-items: center;
       justify-content: center;
+      border-radius: 0.5rem;
       overflow: hidden;
+      margin: 0 auto;
     }
-    .stream-card .image-container img {
+    .logo-box img {
       max-width: 80%;
       max-height: 80%;
       object-fit: contain;
@@ -30,7 +28,7 @@
 </head>
 <body>
   <main class="container mx-auto px-4 py-8" id="streams-container">
-    <!-- Streams load here -->
+    <!-- Streams will load here -->
   </main>
 
   <script>
@@ -41,8 +39,9 @@
     fetch(`api.json?nocache=${Date.now()}`)
       .then(res => res.json())
       .then(data => {
+        // Keep the original behavior exactly
         const streams = data.filter(item => item.parent === matchName || item.name === matchName);
-        if (streams.length === 0) {
+        if (!streams.length) {
           container.innerHTML = `<div class="text-center py-20 text-gray-400">No streams available</div>`;
           return;
         }
@@ -55,26 +54,26 @@
                 (item.linkType === "internal" ? `play.html?name=${encodeURIComponent(item.name)}` : "#");
 
               return `
-                <article class="stream-card">
-                  <div class="image-container">
+                <div class="text-center">
+                  <div class="logo-box">
                     <img src="${item.image}" alt="${item.name}">
                   </div>
-                  <h2 class="text-sm font-semibold text-center mt-2 text-gray-200 truncate">${item.name}</h2>
+                  <h2 class="text-sm font-semibold text-gray-200 mt-2 truncate">${item.name}</h2>
                   <a href="${linkUrl}" ${isExternal ? 'target="_blank"' : ''} 
-                     class="block mt-2 text-center bg-gradient-to-r from-red-600 to-red-700 
+                     class="inline-block mt-2 bg-gradient-to-r from-red-600 to-red-700 
                             hover:from-red-700 hover:to-red-800 text-white px-3 py-1.5 
                             rounded-md text-xs font-medium transition-transform hover:scale-105">
                     <i class="fas fa-play"></i> Watch
                   </a>
-                </article>
+                </div>
               `;
             }).join('')}
           </div>
         `;
       })
       .catch(err => {
-        container.innerHTML = `<div class="text-center py-20 text-gray-400">Error loading streams</div>`;
         console.error(err);
+        container.innerHTML = `<div class="text-center py-20 text-gray-400">Error loading streams</div>`;
       });
   </script>
 </body>
