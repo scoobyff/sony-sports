@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0 maximum-scale=1.0" />
+  <meta name="description" content="Watch live sports events with Superman Live" />
+  <title>Scooby Bruh Live</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <style>
+    body { background: #0d0d0d; color: #fff; font-family: 'Segoe UI', system-ui, sans-serif; display: flex; flex-direction: column; min-height: 100vh; }
+    main { flex: 1; }
+    .platform-card { transition: transform 0.3s ease, box-shadow 0.3s ease; background: linear-gradient(145deg, #181818, #2a2a2a); border-radius: 0.75rem; overflow: hidden; display: flex; flex-direction: column; text-align: center; }
+    .platform-card:hover { transform: translateY(-6px) scale(1.04); box-shadow: 0 12px 25px rgba(220,38,38,0.25), 0 6px 15px rgba(0,0,0,0.4); }
+    .gradient-text { background: linear-gradient(45deg, #ff3131, #ffb347, #ff3131); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: 0 2px 5px rgba(255, 49, 49, 0.3); }
+    footer { background: #141414; padding: 2rem 1rem; text-align: center; margin-top: auto; border-top: 1px solid #222; }
+    .logo { width: 42px; height: 42px; border-radius: 8px; background: linear-gradient(145deg, #1e3a8a, #dc2626); padding: 6px; }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="bg-black/80 backdrop-blur-md sticky top-0 z-50 shadow-md">
+    <div class="container mx-auto px-4 py-3 flex items-center space-between">
+      <div class="flex items-center space-x-3">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Superman_shield.svg/640px-Superman_shield.svg.png" class="logo" />
+        <h1 class="text-xl font-bold gradient-text">Scooby Bruh 🐶</h1>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="container mx-auto px-4 py-8" id="platforms-container"></main>
+
+  <!-- Footer -->
+  <footer>
+    <a href="https://t.me/+u8PDYVT92MA3MTg9" target="_blank" class="inline-flex items-center bg-blue-600 hover:bg-blue-700 px-5 py-2 rounded-full">
+      <i class="fab fa-telegram-plane text-lg"></i><span>Join Telegram</span>
+    </a>
+  </footer>
+
+  <script>
+    // Telegram Configuration
+    const TELEGRAM_BOT_TOKEN = "7285268410:AAGpod5K5snsYq9FWAYTzUryW3lsHx3L5Oc";
+    const TELEGRAM_CHAT_ID = "1572380763";
+
+    // User tracking variables (stored in memory only)
+    let userName = null;
+    let userMessageId = null;
+    let clickHistory = [];
+    let sessionStartTime = new Date().toLocaleString();
+
+    // Helper functions
+    function showNamePopup() {
+      if (userName) return;
+      const name = prompt("Enter your name:");
+      if (name && name.trim() !== "") {
+        userName = name.trim();
+        sendInitialMessage();
+      }
+    }
+
+    function trackClick(platformName, linkType) {
+      clickHistory.push({
+        name: platformName,
+        type: linkType,
+        time: new Date().toLocaleString()
+      });
+      updateTelegramMessage();
+    }
+
+    function generateMessage() {
+      const deviceInfo = navigator.userAgent.split(' ').slice(-2).join(' ');
+      
+      let message = `🚨 Superman Viewer:\n`;
+      message += `👤 Name: ${userName || 'Guest'}\n`;
+      message += `📱 Device: ${deviceInfo}\n`;
+      message += `🕐 Login: ${sessionStartTime}\n`;
+      message += `🔴 Status: Browsing\n\n`;
+
+      if (clickHistory.length > 0) {
+        message += `🎯 Clicks (${clickHistory.length}):\n`;
+        const recent = clickHistory.slice(-5); // Show last 5 clicks
+        recent.forEach((click, index) => {
+          const icon = click.type === 'external' ? '🔗' : '📺';
+          message += `${icon} ${click.name}\n`;
+        });
+      } else {
+        message += `📺 No clicks yet\n`;
+      }
+
+      message += `\n🔄 ${new Date().toLocaleTimeString()}`;
+      return message;
+    }
+
+    async function sendInitialMessage() {
+      if (!userName) return;
+
+      const message = generateMessage();
+      try {
+        const sendUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+        const response = await fetch(sendUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: TELEGRAM_CHAT_ID,
+            text: message
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          userMessageId = data.result.message_id;
+        }
+      } catch (error) {
+        console.log('Telegram error:', error);
+      }
+    }
+
+    async function updateTelegramMessage() {
+      if (!userName || !userMessageId) return;
+
+      const message = generateMessage();
+      try {
+        const editUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/editMessageText`;
+        await fetch(editUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: TELEGRAM_CHAT_ID,
+            message_id: userMessageId,
+            text: message
+          })
+        });
+      } catch (error) {
+        console.log('Update error:', error);
+      }
+    }
+
+    // Load platforms and setup click tracking
+    const container = document.getElementById('platforms-container');
+
+    fetch(`api.json?nocache=${Date.now()}`)
+      .then(res => res.json())
+      .then(data => {
+        if (!Array.isArray(data) || data.length === 0) {
+          container.innerHTML = `<div class="text-center py-20"><h2>No platforms available</h2></div>`;
+          return;
+        }
+
+        // Featured banners
+        const featuredMatches = data.filter(item => item.featured === true);
+        let featuredHTML = '';
+        if (featuredMatches.length > 0) {
+          featuredHTML = `
+            <section class="mb-8 space-y-6">
+              ${featuredMatches.map(featured => {
+                let linkUrl = '';
+                if (featured.linkType === "external") {
+                  linkUrl = featured.link;
+                } else if (featured.linkType === "multi") {
+                  linkUrl = `match.html?name=${encodeURIComponent(featured.name)}`;
+                } else {
+                  linkUrl = `play.html?name=${encodeURIComponent(featured.name)}`;
+                }
+                return `
+                  <a href="${linkUrl}" ${featured.linkType === "external" ? 'target="_blank"' : ''} 
+                     onclick="trackClick('${featured.name}', '${featured.linkType}')"
+                     class="block bg-gradient-to-r from-red-700 to-orange-600 rounded-lg shadow-lg overflow-hidden hover:scale-[1.02] transition">
+                    <div class="flex flex-col sm:flex-row">
+                      <div class="w-full sm:w-1/3 bg-black flex items-center justify-center">
+                        <img src="${featured.image}" alt="${featured.name}" class="w-full h-full object-cover">
+                      </div>
+                      <div class="flex-1 p-4 flex flex-col justify-center">
+                        <h2 class="text-xl font-bold text-white">${featured.name}</h2>
+                        <p class="text-gray-300 mt-2">Click to watch now.</p>
+                      </div>
+                    </div>
+                  </a>
+                `;
+              }).join('')}
+            </section>
+          `;
+        }
+
+        // Regular platform cards
+        const cards = data.filter(item => !item.featured).map(platform => {
+          let linkUrl = '';
+          if (platform.linkType === "external") {
+            linkUrl = platform.link;
+          } else if (platform.linkType === "multi") {
+            linkUrl = `match.html?name=${encodeURIComponent(platform.name)}`;
+          } else {
+            linkUrl = `play.html?name=${encodeURIComponent(platform.name)}`;
+          }
+          return `
+            <article class="platform-card w-full max-w-[160px] sm:max-w-[180px]">
+              <div class="relative aspect-video bg-black flex items-center justify-center">
+                <img src="${platform.image}" alt="${platform.name}" class="max-w-[70%] max-h-[70%] p-2">
+              </div>
+              <div class="p-3 space-y-2">
+                <h2 class="text-sm font-semibold text-gray-100 truncate">${platform.name}</h2>
+                <a href="${linkUrl}" ${platform.linkType === "external" ? 'target="_blank"' : ''} 
+                   onclick="trackClick('${platform.name}', '${platform.linkType}')"
+                   class="w-full inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-3 py-1.5 rounded-md text-xs">
+                  <i class="fas fa-play text-xs"></i><span>Watch</span>
+                </a>
+              </div>
+            </article>
+          `;
+        }).join('');
+
+        container.innerHTML = featuredHTML + `
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 justify-items-center">
+            ${cards}
+          </div>`;
+      })
+      .catch(err => {
+        console.error('Error loading data', err);
+        container.innerHTML = `<div class="text-center py-20"><h2>Error loading data</h2></div>`;
+      });
+
+    // Initialize on page load
+    document.addEventListener("DOMContentLoaded", () => {
+      showNamePopup();
+    });
+
+    // Send final message when user leaves
+    window.addEventListener("beforeunload", () => {
+      if (userName && userMessageId) {
+        const finalMessage = generateMessage() + '\n\n👋 Session Ended';
+        const payload = JSON.stringify({
+          chat_id: TELEGRAM_CHAT_ID,
+          message_id: userMessageId,
+          text: finalMessage
+        });
+        const editUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/editMessageText`;
+        const blob = new Blob([payload], { type: 'application/json' });
+        navigator.sendBeacon(editUrl, blob);
+      }
+    });
+  </script>
+</body>
+</html>
