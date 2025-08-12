@@ -9,7 +9,7 @@ let watchHistory = [];
 let externalClicks = [];
 let adClicks = [];
 
-// Format time helper
+// Helpers
 function formatTime(seconds) {
   const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
   const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
@@ -17,20 +17,6 @@ function formatTime(seconds) {
   return `${h}:${m}:${s}`;
 }
 
-// Send message to Telegram
-function sendToTelegram(message) {
-  fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      chat_id: TELEGRAM_CHAT_ID,
-      text: message,
-      parse_mode: "HTML"
-    })
-  }).catch(err => console.error("Telegram send error:", err));
-}
-
-// Ask for username popup
 function showNamePopup() {
   if (userName) return;
   const name = prompt("Enter your name:");
@@ -40,7 +26,6 @@ function showNamePopup() {
   }
 }
 
-// Start tracking watch time
 function startWatchTimer(streamName) {
   watchStartTime = Date.now();
   watchHistory.push({
@@ -51,7 +36,6 @@ function startWatchTimer(streamName) {
   });
 }
 
-// Stop tracking watch time
 function stopWatchTimer() {
   if (!watchStartTime || watchHistory.length === 0) return;
   const now = Date.now();
@@ -62,48 +46,35 @@ function stopWatchTimer() {
   watchStartTime = null;
 }
 
-// Track external click
 function trackExternalPlayer(name) {
   externalClicks.push({ name, time: new Date().toLocaleString() });
 }
 
-// Track ad click
 function trackAdClick(adName) {
   adClicks.push({ adName, time: new Date().toLocaleString() });
 }
 
-// Maintenance check
 function checkMaintenanceStatus(url) {
   fetch(url)
     .then(res => res.json())
-    .then(data => {
-      if (data.maintenance) {
-        alert("⚠️ Site is under maintenance. Some features may be unavailable.");
-      }
-    })
+    .then(data => { if (data.maintenance) alert("⚠️ Site is under maintenance."); })
     .catch(() => {});
 }
 
-// Broadcast check
 function checkBroadcast(url) {
   fetch(url)
     .then(res => res.json())
-    .then(data => {
-      if (data.broadcast) {
-        alert(`📢 Broadcast: ${data.message}`);
-      }
-    })
+    .then(data => { if (data.broadcast) alert(`📢 Broadcast: ${data.message}`); })
     .catch(() => {});
 }
 
-// Send summary report
 function sendSummary() {
   stopWatchTimer();
   const deviceInfo = navigator.userAgent;
   let message = `🚨 Scooby Viewer:\n`;
   message += `Name: ${userName || 'Guest'}\n`;
   message += `Device: ${deviceInfo}\n`;
-  message += `Login Time: ${new Date(performance.timing.navigationStart).toLocaleString()}\n\n`;
+  message += `Login Time: ${new Date(performance.timeOrigin).toLocaleString()}\n\n`;
 
   if (watchHistory.length > 0) {
     message += `📺 Watch History:\n`;
@@ -134,10 +105,13 @@ function sendSummary() {
 
   message += `\n⏱️ Total Watch Time: ${formatTime(totalWatchSeconds)}`;
 
-  sendToTelegram(message);
+  const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+  const payload = JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message });
+
+  const blob = new Blob([payload], { type: 'application/json' });
+  navigator.sendBeacon(url, blob);
 }
 
-// On page load
 document.addEventListener("DOMContentLoaded", () => {
   showNamePopup();
   window.addEventListener("beforeunload", sendSummary);
