@@ -41,20 +41,16 @@
     "featured": true,
     "streams": [
       {
-        "name": "Main Feed",
-        "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Flag_of_England.svg/1024px-Flag_of_England.svg.png",
-        "linkType": "internal",
-        "type": "hls",
-        "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+        "name": "Willow HD",
+        "image": "http://p-img.movetv.com/cms/images/b7c5841c82ec21c38cd43815c7c49791ae3bcc56.png",
+        "linkType": "external",
+        "link": "https://scoobystreamsv2.vercel.app/play2.html?id=willowbycricbuzz"
       },
       {
-        "name": "Backup Feed",
-        "image": "https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg",
-        "linkType": "internal",
-        "type": "clearkey",
-        "url": "https://example.com/clearkey-test.mpd",
-        "k1": "81352bc47ec1177b321ee65ac1be7f10",
-        "k2": "c8b886142005d7e5067c8717777eaac4"
+        "name": "Willow 2 HD",
+        "image": "https://p-img.movetv.com/1280x720/3dca399cce2d5ddec3993ae3dc351399.png",
+        "linkType": "external",
+        "link": "https://scoobystreamsv2.vercel.app/play2.html?id=willow2bycricbuzz"
       }
     ]
   },
@@ -72,7 +68,7 @@
    },
    {
         "name": "Sony Ten 4 Telugu",
-        "image": "https://brand-websites-prod.s3.ap-south-1.amazonaws.com/sonypicturesnetworksindia/logo/38_275.png",
+        "image": "https://brand-websites-prod.s3.ap-south-1.amazonaws.com/sony-sports-networks-live/channel_logos/Sony%20Sports%20TEN%204%20Telugu.png",
         "linkType": "external",
         "link": "https://scoobysports.vercel.app/player/sonyten4"
    },
