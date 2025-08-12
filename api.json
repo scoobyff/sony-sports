@@ -57,5 +57,31 @@
         "k2": "c8b886142005d7e5067c8717777eaac4"
       }
     ]
-  }
+  },
+  {
+    "name": "The Hundred Womens",
+    "image": "https://www.fancode.com/skillup-uploads/cms-media/132768_5529_VSS_SVL_fc-Web.jpg",
+    "linkType": "multi",
+    "featured": true,
+    "streams": [
+      {
+        "name": "Fancode English",
+        "image": "http://p-img.movetv.com/cms/images/b7c5841c82ec21c38cd43815c7c49791ae3bcc56.png",
+        "linkType": "external",
+        "link": "https://scoobyfancode.vercel.app/play.html?id=132768"
+   },
+   {
+        "name": "Sony Ten 4 Telugu",
+        "image": "http://p-img.movetv.com/cms/images/b7c5841c82ec21c38cd43815c7c49791ae3bcc56.png",
+        "linkType": "external",
+        "link": "https://scoobysports.vercel.app/player/sonyten4"
+   },
+   {
+        "name": "Sony Ten 5 English",
+        "image": "http://p-img.movetv.com/cms/images/b7c5841c82ec21c38cd43815c7c49791ae3bcc56.png",
+        "linkType": "external",
+        "link": "https://scoobysports.vercel.app/player/sonyten5"
+   }
+  ]
+ }
 ]
