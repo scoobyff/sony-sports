@@ -100,11 +100,11 @@
         "link": "https://scoobysports.vercel.app/player/sonyten5"
       }
     ]
+    },
     {
     "name": "Fancode Live Matches",
     "image": "https://upload.wikimedia.org/wikipedia/en/thumb/6/6c/FanCode_logo.svg/1200px-FanCode_logo.svg.png",
     "linkType": "external",
     "link": "https://scoobyfancode.vercel.app"
    }
-  }
 ]
