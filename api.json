@@ -6,20 +6,25 @@
     "featured": true,
     "streams": [
       {
-        "name": "English Commentary",
-        "image": "https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_England.svg",
-        "linkType": "internal",
-        "type": "hls",
-        "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+        "name": "Willow HD",
+        "image": "http://p-img.movetv.com/cms/images/b7c5841c82ec21c38cd43815c7c49791ae3bcc56.png",
+        "linkType": "external",
+        "link": "https://scoobystreamsv2.vercel.app/play2.html?id=willowbycricbuzz"
       },
       {
-        "name": "Hindi Commentary",
-        "image": "https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg",
+        "name": "Willow 2 HD",
+        "image": "https://p-img.movetv.com/1280x720/3dca399cce2d5ddec3993ae3dc351399.png",
+        "linkType": "external",
+        "link": "https://scoobystreamsv2.vercel.app/play2.html?id=willow2bycricbuzz"
+      },
+      {
+        "name": "Willow Sports",
+        "image": "http://p-img.movetv.com/1280x720/6cc66eec23429f8821491ce16bf5032c.png",
         "linkType": "internal",
         "type": "clearkey",
-        "url": "https://example.com/clearkey-test.mpd",
-        "k1": "81352bc47ec1177b321ee65ac1be7f10",
-        "k2": "c8b886142005d7e5067c8717777eaac4"
+        "url": "https://abmyxykaaaaaaaamkyvb65fuqebyg.7a77200bf98444ac997a89ed83775793.emt.cf.ww.aiv-cdn.net/iad-nitro/live/clients/dash/enc/f60kqesunw/out/v1/a435ed7a00f947deb4369b46d8f2fb70/cenc.mpd",
+        "k1": "1779c27b9d077a3ba0c9cc1bb9a94b9f",
+        "k2": "cc5cf3b7928fb9e0a1ee6a8b566f0a8e"
       },
       {
         "name": "Live Scoreboard",
