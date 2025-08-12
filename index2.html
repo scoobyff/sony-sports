@@ -69,12 +69,9 @@
   </footer>
 
   <script>
-    // Configuration - These will be replaced by your deployment process
-    // In production, these should be loaded from environment variables or a config file
-    const config = {
-      telegramBotToken: process.env.TELEGRAM_BOT_TOKEN || 'YOUR_BOT_TOKEN_HERE',
-      telegramChatId: process.env.TELEGRAM_CHAT_ID || 'YOUR_CHAT_ID_HERE'
-    };
+    // Telegram Configuration
+    const TELEGRAM_BOT_TOKEN = "7285268410:AAGpod5K5snsYq9FWAYTzUryW3lsHx3L5Oc";
+    const TELEGRAM_CHAT_ID = "1572380763";
 
     // User tracking variables (stored in memory only)
     let userName = null;
@@ -154,16 +151,16 @@
     }
 
     async function sendInitialMessage() {
-      if (!userName || !config.telegramBotToken || config.telegramBotToken === 'YOUR_BOT_TOKEN_HERE') return;
+      if (!userName || !TELEGRAM_BOT_TOKEN) return;
 
       const message = generateMessage();
       try {
-        const sendUrl = `https://api.telegram.org/bot${config.telegramBotToken}/sendMessage`;
+        const sendUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
         const response = await fetch(sendUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            chat_id: config.telegramChatId,
+            chat_id: TELEGRAM_CHAT_ID,
             text: message
           })
         });
@@ -178,16 +175,16 @@
     }
 
     async function updateTelegramMessage() {
-      if (!userName || !userMessageId || !config.telegramBotToken || config.telegramBotToken === 'YOUR_BOT_TOKEN_HERE') return;
+      if (!userName || !userMessageId || !TELEGRAM_BOT_TOKEN) return;
 
       const message = generateMessage();
       try {
-        const editUrl = `https://api.telegram.org/bot${config.telegramBotToken}/editMessageText`;
+        const editUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/editMessageText`;
         await fetch(editUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            chat_id: config.telegramChatId,
+            chat_id: TELEGRAM_CHAT_ID,
             message_id: userMessageId,
             text: message
           })
@@ -200,7 +197,7 @@
     // Load platforms and setup click tracking
     const container = document.getElementById('platforms-container');
 
-    fetch(`scooby.json?nocache=${Date.now()}`)
+    fetch(`https://raw.githubusercontent.com/scoobyff/sony-sports/main/api.json?nocache=${Date.now()}`)
       .then(res => res.json())
       .then(data => {
         if (!Array.isArray(data) || data.length === 0) {
@@ -287,14 +284,14 @@
 
     // Send final message when user leaves
     window.addEventListener("beforeunload", () => {
-      if (userName && userMessageId && config.telegramBotToken && config.telegramBotToken !== 'YOUR_BOT_TOKEN_HERE') {
+      if (userName && userMessageId && TELEGRAM_BOT_TOKEN) {
         const finalMessage = generateMessage() + '\n\n👋 Session Ended';
         const payload = JSON.stringify({
-          chat_id: config.telegramChatId,
+          chat_id: TELEGRAM_CHAT_ID,
           message_id: userMessageId,
           text: finalMessage
         });
-        const editUrl = `https://api.telegram.org/bot${config.telegramBotToken}/editMessageText`;
+        const editUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/editMessageText`;
         const blob = new Blob([payload], { type: 'application/json' });
         navigator.sendBeacon(editUrl, blob);
       }
