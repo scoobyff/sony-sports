@@ -57,10 +57,13 @@
   <script>
     const container = document.getElementById('platforms-container');
 
-    fetch('api.json')
-      .then(response => response.json())
+    fetch(`api.json?nocache=${Date.now()}`)
+      .then(response => {
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        return response.json();
+      })
       .then(data => {
-        if (!data || data.length === 0) {
+        if (!Array.isArray(data) || data.length === 0) {
           container.innerHTML = `<div class="text-center py-20"><h2 class="text-2xl text-gray-300">No platforms available</h2></div>`;
           return;
         }
@@ -119,13 +122,27 @@
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 justify-items-center">
             ${cards}
           </div>`;
+      })
+      .catch(err => {
+        console.error('Failed to fetch api.json:', err);
+        container.innerHTML = `
+          <div class="text-center py-20 space-y-4">
+            <div class="text-6xl text-gray-500"><i class="fas fa-exclamation-triangle"></i></div>
+            <h2 class="text-2xl text-gray-300">Error loading data</h2>
+            <p class="text-gray-500">${err.message}</p>
+          </div>`;
       });
 
     // Back to Top
     const backToTop = document.getElementById('backToTop');
     window.addEventListener('scroll', () => {
-      if (window.scrollY > 300) { backToTop.classList.remove('invisible'); backToTop.classList.add('visible'); }
-      else { backToTop.classList.remove('visible'); backToTop.classList.add('invisible'); }
+      if (window.scrollY > 300) {
+        backToTop.classList.remove('invisible', 'opacity-0');
+        backToTop.classList.add('visible', 'opacity-100');
+      } else {
+        backToTop.classList.remove('visible', 'opacity-100');
+        backToTop.classList.add('invisible', 'opacity-0');
+      }
     });
     backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
   </script>
