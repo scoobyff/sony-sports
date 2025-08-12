@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Player - Superman Live</title>
+  <script src="https://content.jwplatform.com/libraries/IDzF9Zmk.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { font-family: Arial, sans-serif; background-color: #000; overflow: hidden; width: 100%; height: 100%; }
+    #myElement { position: absolute; width: 100%; height: 100%; }
+    #error-message { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 22px; text-align: center; padding: 20px; background-color: rgba(0,0,0,0.8); border-radius: 8px; z-index: 1000; }
+  </style>
+</head>
+<body>
+  <div id="myElement"></div>
+  <div id="error-message"></div>
+
+  <script>
+    function showError(msg) {
+      const div = document.getElementById('error-message');
+      div.textContent = msg;
+      div.style.display = 'block';
+    }
+    function getParam(name) {
+      return new URLSearchParams(window.location.search).get(name);
+    }
+
+    const channelName = getParam('name');
+    if (!channelName) {
+      showError('No channel specified!');
+    } else {
+      fetch('api.json')
+        .then(res => res.json())
+        .then(data => {
+          const channel = data.find(item => item.name.toLowerCase() === channelName.toLowerCase() && item.linkType === 'internal');
+          if (!channel) {
+            showError('Channel not found or not playable internally!');
+            return;
+          }
+          const player = jwplayer("myElement");
+          const opts = {
+            width: "100%",
+            height: "100%",
+            autostart: true,
+            primary: "html5",
+            hlshtml: true,
+            aspectratio: "16:9",
+            controls: true,
+            responsive: true,
+            logo: {
+              file: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Superman_shield.svg/640px-Superman_shield.svg.png",
+              hide: true
+            }
+          };
+          if (channel.type === "clearkey") {
+            opts.file = channel.url;
+            opts.drm = { clearkey: { keyId: channel.k1, key: channel.k2 } };
+          } else if (channel.type === "hls") {
+            opts.file = channel.url;
+          } else {
+            showError('Unsupported stream type!');
+            return;
+          }
+          player.setup(opts);
+        })
+        .catch(() => showError('Error loading channel.'));
+    }
+  </script>
+</body>
+</html>
