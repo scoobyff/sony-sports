@@ -1,6 +1,13 @@
 [
   {
-    "name": "The Hundred",
+    "name": "The Hundred Womens",
+    "image": "https://origin-staticv2.sonyliv.com/videoasset_images/manage_file/1000006266/175494204410293_Th100_mens25_Birmingham_Phoenix_vs_Oval_Invincibles_12aug_landscape_thumb_ton.jp",
+    "linkType": "external",
+    "link": "https://scoobysports.vercel.app/player/willowsports",
+    "featured": true
+  },
+  {
+    "name": "The Hundred Mens",
     "image": "https://origin-staticv2.sonyliv.com/videoasset_images/manage_file/1000006040/1754597251768215_the_hundred_mens25_Manchester_Originals_vs_London_Spirit_7aug_multi_landscape_thumb.jpg",
     "linkType": "external",
     "link": "https://scoobysports.vercel.app/player/willowsports",
