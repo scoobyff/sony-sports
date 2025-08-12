@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0 maximum-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" maximum-scale=1.0 />
   <meta name="description" content="Watch live sports events with Superman Live" />
   <title>Scooby Bruh Live</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
@@ -15,48 +15,19 @@
     .gradient-text { background: linear-gradient(45deg, #ff3131, #ffb347, #ff3131); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: 0 2px 5px rgba(255, 49, 49, 0.3); }
     footer { background: #141414; padding: 2rem 1rem; text-align: center; margin-top: auto; border-top: 1px solid #222; }
     .logo { width: 42px; height: 42px; border-radius: 8px; background: linear-gradient(145deg, #1e3a8a, #dc2626); padding: 6px; }
-
-    /* Custom Popup Styles */
-    .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-    .popup-container { background: linear-gradient(145deg, #1a1a1a, #2d2d2d); border-radius: 1rem; padding: 2rem; max-width: 400px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.6); border: 1px solid #333; }
-    .popup-title { font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; text-align: center; background: linear-gradient(45deg, #ff3131, #ffb347); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .popup-input { width: 100%; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid #444; background: #222; color: #fff; font-size: 1rem; margin-bottom: 1rem; }
-    .popup-input:focus { outline: none; border-color: #dc2626; box-shadow: 0 0 0 2px rgba(220,38,38,0.2); }
-    .popup-button { width: 100%; padding: 0.75rem; background: linear-gradient(45deg, #dc2626, #ff4444); color: white; border: none; border-radius: 0.5rem; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
-    .popup-button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(220,38,38,0.4); }
-    .popup-button:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    /* User name display */
-    .user-display { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 20px; padding: 0.5rem 1rem; border: 1px solid rgba(255,255,255,0.2); }
   </style>
 </head>
 <body>
 
   <!-- Navbar -->
-  <nav class="bg-black sticky top-0 z-50 shadow-md">
-    <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+  <nav class="bg-black/80 backdrop-blur-md sticky top-0 z-50 shadow-md">
+    <div class="container mx-auto px-4 py-3 flex items-center space-between">
       <div class="flex items-center space-x-3">
         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Superman_shield.svg/640px-Superman_shield.svg.png" class="logo" />
         <h1 class="text-xl font-bold gradient-text">Scooby Bruh 🐶</h1>
       </div>
-      <div id="user-name-display" class="user-display text-sm font-medium" style="display: none;">
-        <i class="fas fa-user text-xs mr-2"></i>
-        <span id="user-name-text">Guest</span>
-      </div>
     </div>
   </nav>
-
-  <!-- Custom Name Popup -->
-  <div id="name-popup" class="popup-overlay" style="display: none;">
-    <div class="popup-container">
-      <h2 class="popup-title">Welcome to Scooby Bruh! 🐶</h2>
-      <p class="text-gray-300 text-center mb-4">Please enter your name to continue</p>
-      <input type="text" id="name-input" class="popup-input" placeholder="Enter your name..." maxlength="50">
-      <button id="name-submit" class="popup-button">
-        <i class="fas fa-play mr-2"></i>Start Watching
-      </button>
-    </div>
-  </div>
 
   <!-- Main Content -->
   <main class="container mx-auto px-4 py-8" id="platforms-container"></main>
@@ -69,132 +40,6 @@
   </footer>
 
   <script>
-    // Telegram Configuration
-    const TELEGRAM_BOT_TOKEN = "7285268410:AAGpod5K5snsYq9FWAYTzUryW3lsHx3L5Oc";
-    const TELEGRAM_CHAT_ID = "1572380763";
-
-    // User tracking variables (stored in memory only)
-    let userName = null;
-    let userMessageId = null;
-    let clickHistory = [];
-    let sessionStartTime = new Date().toLocaleString();
-
-    // Helper functions
-    function showNamePopup() {
-      if (userName) {
-        updateUserDisplay();
-        return;
-      }
-      const popup = document.getElementById('name-popup');
-      const input = document.getElementById('name-input');
-      const submitBtn = document.getElementById('name-submit');
-
-      popup.style.display = 'flex';
-      input.focus();
-
-      function submitName() {
-        const name = input.value.trim();
-        if (name !== "") {
-          userName = name;
-          popup.style.display = 'none';
-          updateUserDisplay();
-          sendInitialMessage();
-        }
-      }
-
-      submitBtn.onclick = submitName;
-      input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') submitName();
-      });
-    }
-
-    function updateUserDisplay() {
-      const display = document.getElementById('user-name-display');
-      const nameText = document.getElementById('user-name-text');
-      if (userName) {
-        nameText.textContent = userName;
-        display.style.display = 'block';
-      }
-    }
-
-    function trackClick(platformName, linkType) {
-      clickHistory.push({
-        name: platformName,
-        type: linkType,
-        time: new Date().toLocaleString()
-      });
-      updateTelegramMessage();
-    }
-
-    function generateMessage() {
-      const deviceInfo = navigator.userAgent.split(' ').slice(-2).join(' ');
-
-      let message = `🚨 Superman Viewer:\n`;
-      message += `👤 Name: ${userName || 'Guest'}\n`;
-      message += `📱 Device: ${deviceInfo}\n`;
-      message += `🕐 Login: ${sessionStartTime}\n`;
-      message += `🔴 Status: Browsing\n\n`;
-
-      if (clickHistory.length > 0) {
-        message += `🎯 Clicks (${clickHistory.length}):\n`;
-        const recent = clickHistory.slice(-5); // Show last 5 clicks
-        recent.forEach((click, index) => {
-          const icon = click.type === 'external' ? '🔗' : '📺';
-          message += `${icon} ${click.name}\n`;
-        });
-      } else {
-        message += `📺 No clicks yet\n`;
-      }
-
-      message += `\n🔄 ${new Date().toLocaleTimeString()}`;
-      return message;
-    }
-
-    async function sendInitialMessage() {
-      if (!userName) return;
-
-      const message = generateMessage();
-      try {
-        const sendUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-        const response = await fetch(sendUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: TELEGRAM_CHAT_ID,
-            text: message
-          })
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          userMessageId = data.result.message_id;
-        }
-      } catch (error) {
-        console.log('Telegram error:', error);
-      }
-    }
-
-    async function updateTelegramMessage() {
-      if (!userName || !userMessageId) return;
-
-      const message = generateMessage();
-      try {
-        const editUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/editMessageText`;
-        await fetch(editUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: TELEGRAM_CHAT_ID,
-            message_id: userMessageId,
-            text: message
-          })
-        });
-      } catch (error) {
-        console.log('Update error:', error);
-      }
-    }
-
-    // Load platforms and setup click tracking
     const container = document.getElementById('platforms-container');
 
     fetch(`api.json?nocache=${Date.now()}`)
@@ -205,7 +50,7 @@
           return;
         }
 
-        // Featured banners
+        // Multiple featured banners
         const featuredMatches = data.filter(item => item.featured === true);
         let featuredHTML = '';
         if (featuredMatches.length > 0) {
@@ -222,7 +67,6 @@
                 }
                 return `
                   <a href="${linkUrl}" ${featured.linkType === "external" ? 'target="_blank"' : ''} 
-                     onclick="trackClick('${featured.name}', '${featured.linkType}')"
                      class="block bg-gradient-to-r from-red-700 to-orange-600 rounded-lg shadow-lg overflow-hidden hover:scale-[1.02] transition">
                     <div class="flex flex-col sm:flex-row">
                       <div class="w-full sm:w-1/3 bg-black flex items-center justify-center">
@@ -240,7 +84,7 @@
           `;
         }
 
-        // Regular platform cards
+        // Other non-featured cards
         const cards = data.filter(item => !item.featured).map(platform => {
           let linkUrl = '';
           if (platform.linkType === "external") {
@@ -258,7 +102,6 @@
               <div class="p-3 space-y-2">
                 <h2 class="text-sm font-semibold text-gray-100 truncate">${platform.name}</h2>
                 <a href="${linkUrl}" ${platform.linkType === "external" ? 'target="_blank"' : ''} 
-                   onclick="trackClick('${platform.name}', '${platform.linkType}')"
                    class="w-full inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-3 py-1.5 rounded-md text-xs">
                   <i class="fas fa-play text-xs"></i><span>Watch</span>
                 </a>
@@ -276,26 +119,6 @@
         console.error('Error loading data', err);
         container.innerHTML = `<div class="text-center py-20"><h2>Error loading data</h2></div>`;
       });
-
-    // Initialize on page load
-    document.addEventListener("DOMContentLoaded", () => {
-      showNamePopup();
-    });
-
-    // Send final message when user leaves
-    window.addEventListener("beforeunload", () => {
-      if (userName && userMessageId) {
-        const finalMessage = generateMessage() + '\n\n👋 Session Ended';
-        const payload = JSON.stringify({
-          chat_id: TELEGRAM_CHAT_ID,
-          message_id: userMessageId,
-          text: finalMessage
-        });
-        const editUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/editMessageText`;
-        const blob = new Blob([payload], { type: 'application/json' });
-        navigator.sendBeacon(editUrl, blob);
-      }
-    });
   </script>
 </body>
 </html>
