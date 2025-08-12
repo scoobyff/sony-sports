@@ -68,7 +68,7 @@
     document.addEventListener("DOMContentLoaded", () => {
       if (channelName) startWatchTimer(channelName);
       window.addEventListener("beforeunload", () => {
-        if (channelName) stopWatchTimer(channelName);
+        stopWatchTimer();
       });
     });
   </script>
