@@ -1,7 +1,7 @@
 [
   {
     "name": "The Hundred Womens",
-    "image": "https://www.fancode.com/skillup-uploads/cms-media/132265_5506_BPH-W_OVI-W_Fc-Web.jpg",
+    "image": "https://www.fancode.com/skillup-uploads/cms-media/132266_5506_SOB-W_NOS-W_Fc-Web.jpg",
     "linkType": "multi",
     "featured": true,
     "streams": [
@@ -65,7 +65,7 @@
         "name": "BBC Sports",
         "image": "https://raw.githubusercontent.com/scoobyff/tv-logos/main/misc/media/bbc-sport-hz.png",
         "linkType": "external",
-        "link": "https://scoobysports.vercel.app/player/bbc"
+        "link": "https://scoobysports.vercel.app/player/bbcsports"
       },
       {
         "name": "Willow Sports",
@@ -77,7 +77,7 @@
   },
   {
     "name": "APL T20 2025",
-    "image": "https://www.fancode.com/skillup-uploads/cms-media/132768_5529_VSS_SVL_fc-Web.jpg",
+    "image": "https://www.fancode.com/skillup-uploads/cms-media/132769_5529_ROR_TBW_fc-Web.jpg",
     "linkType": "multi",
     "featured": true,
     "streams": [
@@ -85,7 +85,33 @@
         "name": "Fancode English",
         "image": "https://upload.wikimedia.org/wikipedia/en/thumb/6/6c/FanCode_logo.svg/1200px-FanCode_logo.svg.png",
         "linkType": "external",
-        "link": "https://scoobysports.vercel.app/player/apleng"
+        "link": "https://scoobyfancode.vercel.app/play.html?id=132769"
+      },
+      {
+        "name": "Sony Ten 4 Telugu",
+        "image": "https://brand-websites-prod.s3.ap-south-1.amazonaws.com/sony-sports-networks-live/channel_logos/Sony%20Sports%20TEN%204%20Telugu.png",
+        "linkType": "external",
+        "link": "https://scoobysports.vercel.app/player/sonyten4"
+      },
+      {
+        "name": "Sony Ten 5 English",
+        "image": "https://brand-websites-prod.s3.ap-south-1.amazonaws.com/sony-sports-networks-live/channel_logos/Sony%20Sports%20TEN%205%20HD.png",
+        "linkType": "external",
+        "link": "https://scoobysports.vercel.app/player/sonyten5"
+      }
+    ]
+    },
+    {
+    "name": "APL T20 2025",
+    "image": "https://www.fancode.com/skillup-uploads/cms-media/132770_5529_VSS_BVB_fc-Web.jpg",
+    "linkType": "multi",
+    "featured": true,
+    "streams": [
+      {
+        "name": "Fancode English",
+        "image": "https://upload.wikimedia.org/wikipedia/en/thumb/6/6c/FanCode_logo.svg/1200px-FanCode_logo.svg.png",
+        "linkType": "external",
+        "link": "https://scoobyfancode.vercel.app/play.html?id=132770"
       },
       {
         "name": "Sony Ten 4 Telugu",
