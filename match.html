@@ -1,46 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Match Streams</title>
-<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-</head>
-<body class="bg-black text-white">
-<main class="container mx-auto px-4 py-6" id="match-container"></main>
-<script>
-const params = new URLSearchParams(window.location.search);
-const matchName = params.get("name");
-fetch(`api.json?nocache=${Date.now()}`)
-  .then(res => res.json())
-  .then(data => {
-    const match = data.find(m => m.name === matchName);
-    if (!match || !Array.isArray(match.streams)) {
-      document.getElementById('match-container').innerHTML = `<p>No streams found.</p>`;
-      return;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Match Streams</title>
+  <style>
+    body {
+      background-color: #000;
+      font-family: Arial, sans-serif;
+      color: white;
+      margin: 0;
+      padding: 0;
     }
-    let html = `<section class="mb-6"><img src="${match.image}" class="w-full rounded-lg shadow-lg"></section>`;
-    const cards = match.streams.map(s => {
-      let linkUrl = "#";
-      if (s.linkType === "external") linkUrl = s.link;
-      else if (s.linkType === "internal") linkUrl = `play.html?${new URLSearchParams(s).toString()}`;
-      return `<article class="platform-card w-full max-w-[160px] bg-gray-900 rounded-lg overflow-hidden">
-        <div class="aspect-video flex items-center justify-center bg-black">
-          <img src="${s.image}" alt="${s.name}" class="max-w-[70%] max-h-[70%] object-contain p-2">
-        </div>
-        <div class="p-3 space-y-2">
-          <h2 class="text-sm font-semibold truncate">${s.name}</h2>
-          <a href="${linkUrl}" ${s.linkType==="external" ? 'target="_blank"' : ''} 
-            class="block text-center bg-gradient-to-r from-red-600 to-red-700 text-white px-3 py-1.5 rounded-md text-xs font-medium">
-            <i class="fas fa-play"></i> Watch
-          </a>
-        </div>
-      </article>`;
-    }).join('');
-    html += `<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">${cards}</div>`;
-    document.getElementById('match-container').innerHTML = html;
-  });
+    header {
+      padding: 10px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 15px;
+      padding: 15px;
+      justify-items: center;
+    }
+    .platform-card {
+      width: 160px;
+      height: 200px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: linear-gradient(145deg, #181818, #2a2a2a);
+      border-radius: 0.75rem;
+      overflow: hidden;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      transition: transform 0.2s;
+    }
+    .platform-card:hover {
+      transform: scale(1.05);
+    }
+    .logo-container {
+      height: 120px;
+      background: black;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .logo-container img {
+      max-height: 80%;
+      max-width: 80%;
+      object-fit: contain;
+    }
+    .content {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .content h2 {
+      font-size: 14px;
+      margin: 0 0 8px;
+      font-weight: bold;
+    }
+    .watch-btn {
+      background: #d32f2f;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 5px;
+      font-size: 12px;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .watch-btn:hover {
+      background: #b71c1c;
+    }
+  </style>
+</head>
+<body>
+
+<header id="match-title">Live Match Streams</header>
+
+<div class="grid" id="streams-container"></div>
+
+<script>
+  function getParam(name) {
+    return new URLSearchParams(window.location.search).get(name);
+  }
+
+  const matchName = getParam('name');
+  document.getElementById('match-title').textContent = matchName || 'Live Match Streams';
+
+  fetch('api.json')
+    .then(res => res.json())
+    .then(data => {
+      const matchStreams = data.filter(item => item.parent === matchName);
+      const container = document.getElementById('streams-container');
+
+      if (matchStreams.length === 0) {
+        container.innerHTML = `<p style="text-align:center;">No streams available.</p>`;
+        return;
+      }
+
+      matchStreams.forEach(stream => {
+        const isExternal = stream.linkType === "external";
+        const linkUrl = isExternal
+          ? stream.link
+          : `play.html?name=${encodeURIComponent(stream.name)}`;
+
+        const card = document.createElement('div');
+        card.className = 'platform-card';
+        card.innerHTML = `
+          <div class="logo-container">
+            <img src="${stream.image}" alt="${stream.name}">
+          </div>
+          <div class="content">
+            <h2>${stream.name}</h2>
+            <a href="${linkUrl}" ${isExternal ? 'target="_blank"' : ''} class="watch-btn">▶ Watch</a>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    })
+    .catch(err => {
+      console.error(err);
+      document.getElementById('streams-container').innerHTML = `<p style="text-align:center;">Error loading streams.</p>`;
+    });
 </script>
+
 </body>
 </html>
