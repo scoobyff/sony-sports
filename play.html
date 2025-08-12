@@ -63,12 +63,27 @@
     }
   </script>
 
+  <!-- Updated telegram.js integration -->
   <script src="telegram.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      if (channelName) startWatchTimer(channelName);
+      // Start tracking when player loads
+      if (channelName) {
+        startWatchTimer(channelName);
+      }
+      
+      // Stop tracking when user leaves
       window.addEventListener("beforeunload", () => {
         stopWatchTimer();
+      });
+      
+      // Also track page visibility changes
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          stopWatchTimer();
+        } else if (channelName) {
+          startWatchTimer(channelName);
+        }
       });
     });
   </script>
