@@ -66,19 +66,19 @@
     "streams": [
       {
         "name": "Fancode English",
-        "image": "http://p-img.movetv.com/cms/images/b7c5841c82ec21c38cd43815c7c49791ae3bcc56.png",
+        "image": "https://upload.wikimedia.org/wikipedia/en/thumb/6/6c/FanCode_logo.svg/1200px-FanCode_logo.svg.png",
         "linkType": "external",
         "link": "https://scoobyfancode.vercel.app/play.html?id=132768"
    },
    {
         "name": "Sony Ten 4 Telugu",
-        "image": "http://p-img.movetv.com/cms/images/b7c5841c82ec21c38cd43815c7c49791ae3bcc56.png",
+        "image": "https://jiotvimages.cdn.jio.com/dare_images/images/Ten_4_HD_Telugu.png",
         "linkType": "external",
         "link": "https://scoobysports.vercel.app/player/sonyten4"
    },
    {
         "name": "Sony Ten 5 English",
-        "image": "http://p-img.movetv.com/cms/images/b7c5841c82ec21c38cd43815c7c49791ae3bcc56.png",
+        "image": "https://jiotvimages.cdn.jio.com/dare_images/images/Six_HD.png",
         "linkType": "external",
         "link": "https://scoobysports.vercel.app/player/sonyten5"
    }
