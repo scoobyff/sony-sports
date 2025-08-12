@@ -15,19 +15,48 @@
     .gradient-text { background: linear-gradient(45deg, #ff3131, #ffb347, #ff3131); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: 0 2px 5px rgba(255, 49, 49, 0.3); }
     footer { background: #141414; padding: 2rem 1rem; text-align: center; margin-top: auto; border-top: 1px solid #222; }
     .logo { width: 42px; height: 42px; border-radius: 8px; background: linear-gradient(145deg, #1e3a8a, #dc2626); padding: 6px; }
+    
+    /* Custom Popup Styles */
+    .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+    .popup-container { background: linear-gradient(145deg, #1a1a1a, #2d2d2d); border-radius: 1rem; padding: 2rem; max-width: 400px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.6); border: 1px solid #333; }
+    .popup-title { font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; text-align: center; background: linear-gradient(45deg, #ff3131, #ffb347); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .popup-input { width: 100%; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid #444; background: #222; color: #fff; font-size: 1rem; margin-bottom: 1rem; }
+    .popup-input:focus { outline: none; border-color: #dc2626; box-shadow: 0 0 0 2px rgba(220,38,38,0.2); }
+    .popup-button { width: 100%; padding: 0.75rem; background: linear-gradient(45deg, #dc2626, #ff4444); color: white; border: none; border-radius: 0.5rem; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+    .popup-button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(220,38,38,0.4); }
+    .popup-button:disabled { opacity: 0.5; cursor: not-allowed; }
+    
+    /* User name display */
+    .user-display { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 20px; padding: 0.5rem 1rem; border: 1px solid rgba(255,255,255,0.2); }
   </style>
 </head>
 <body>
 
   <!-- Navbar -->
   <nav class="bg-black/80 backdrop-blur-md sticky top-0 z-50 shadow-md">
-    <div class="container mx-auto px-4 py-3 flex items-center space-between">
+    <div class="container mx-auto px-4 py-3 flex items-center justify-between">
       <div class="flex items-center space-x-3">
         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Superman_shield.svg/640px-Superman_shield.svg.png" class="logo" />
         <h1 class="text-xl font-bold gradient-text">Scooby Bruh 🐶</h1>
       </div>
+      <div id="user-name-display" class="user-display text-sm font-medium" style="display: none;">
+        <i class="fas fa-user text-xs mr-2"></i>
+        <span id="user-name-text">Guest</span>
+      </div>
     </div>
   </nav>
+
+  <!-- Custom Name Popup -->
+  <div id="name-popup" class="popup-overlay" style="display: none;">
+    <div class="popup-container">
+      <h2 class="popup-title">Welcome to Scooby Bruh! 🐶</h2>
+      <p class="text-gray-300 text-center mb-4">Please enter your name to continue</p>
+      <input type="text" id="name-input" class="popup-input" placeholder="Enter your name..." maxlength="50">
+      <button id="name-submit" class="popup-button">
+        <i class="fas fa-play mr-2"></i>Start Watching
+      </button>
+    </div>
+  </div>
 
   <!-- Main Content -->
   <main class="container mx-auto px-4 py-8" id="platforms-container"></main>
@@ -52,11 +81,39 @@
 
     // Helper functions
     function showNamePopup() {
-      if (userName) return;
-      const name = prompt("Enter your name:");
-      if (name && name.trim() !== "") {
-        userName = name.trim();
-        sendInitialMessage();
+      if (userName) {
+        updateUserDisplay();
+        return;
+      }
+      const popup = document.getElementById('name-popup');
+      const input = document.getElementById('name-input');
+      const submitBtn = document.getElementById('name-submit');
+      
+      popup.style.display = 'flex';
+      input.focus();
+      
+      function submitName() {
+        const name = input.value.trim();
+        if (name !== "") {
+          userName = name;
+          popup.style.display = 'none';
+          updateUserDisplay();
+          sendInitialMessage();
+        }
+      }
+      
+      submitBtn.onclick = submitName;
+      input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') submitName();
+      });
+    }
+
+    function updateUserDisplay() {
+      const display = document.getElementById('user-name-display');
+      const nameText = document.getElementById('user-name-text');
+      if (userName) {
+        nameText.textContent = userName;
+        display.style.display = 'block';
       }
     }
 
