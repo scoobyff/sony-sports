@@ -1,5 +1,43 @@
 [
   {
+    "name": "Asia Cup 2025",
+    "image": "https://brand-websites-prod.s3.ap-south-1.amazonaws.com/sony-sports-networks-live/channel_logos/Sony%20Sports%20TEN%201%20HD.png",
+    "linkType": "multi",
+    "featured": true,
+    "streams": [
+      {
+        "name": "Sony Ten 1",
+        "image": "https://brand-websites-prod.s3.ap-south-1.amazonaws.com/sony-sports-networks-live/channel_logos/Sony%20Sports%20TEN%201%20HD.png",
+        "linkType": "external",
+        "link": "https://scoobysports.vercel.app/player/sonyten1"
+      },
+      {
+        "name": "Sony Ten 2",
+        "image": "https://brand-websites-prod.s3.ap-south-1.amazonaws.com/sony-sports-networks-live/channel_logos/Sony%20Sports%20TEN%202%20HD.png",
+        "linkType": "external",
+        "link": "https://scoobysports.vercel.app/player/sonyten2"
+      },
+      {
+        "name": "Sony Ten 3",
+        "image": "https://brand-websites-prod.s3.ap-south-1.amazonaws.com/sony-sports-networks-live/channel_logos/Sony%20Sports%20TEN%203%20Hindi%20HD.png",
+        "linkType": "external",
+        "link": "https://scoobysports.vercel.app/player/sonyten3"
+      },
+      {
+        "name": "Sony Ten 4",
+        "image": "https://brand-websites-prod.s3.ap-south-1.amazonaws.com/sony-sports-networks-live/channel_logos/Sony%20Sports%20TEN%204%20Telugu.png",
+        "linkType": "external",
+        "link": "https://scoobysports.vercel.app/player/sonyten4"
+      },
+      {
+        "name": "Sony Ten 5",
+        "image": "https://brand-websites-prod.s3.ap-south-1.amazonaws.com/sony-sports-networks-live/channel_logos/Sony%20Sports%20TEN%205%20HD.png",
+        "linkType": "external",
+        "link": "https://scoobysports.vercel.app/player/sonyten5"
+      }
+     ]
+    },
+    {
     "name": "The Hundred Womens",
     "image": "https://www.fancode.com/skillup-uploads/cms-media/132266_5506_SOB-W_NOS-W_Fc-Web.jpg",
     "linkType": "multi",
