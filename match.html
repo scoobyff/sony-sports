@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Match Streams</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-black text-white">
+<main class="container mx-auto px-4 py-6" id="match-container"></main>
+<script>
+const params = new URLSearchParams(window.location.search);
+const matchName = params.get("name");
+fetch(`api.json?nocache=${Date.now()}`)
+  .then(res => res.json())
+  .then(data => {
+    const match = data.find(m => m.name === matchName);
+    if (!match || !Array.isArray(match.streams)) {
+      document.getElementById('match-container').innerHTML = `<p>No streams found.</p>`;
+      return;
+    }
+    let html = `<section class="mb-6"><img src="${match.image}" class="w-full rounded-lg shadow-lg"></section>`;
+    const cards = match.streams.map(s => {
+      let linkUrl = "#";
+      if (s.linkType === "external") linkUrl = s.link;
+      else if (s.linkType === "internal") linkUrl = `play.html?${new URLSearchParams(s).toString()}`;
+      return `<article class="platform-card w-full max-w-[160px] bg-gray-900 rounded-lg overflow-hidden">
+        <div class="aspect-video flex items-center justify-center bg-black">
+          <img src="${s.image}" alt="${s.name}" class="max-w-[70%] max-h-[70%] object-contain p-2">
+        </div>
+        <div class="p-3 space-y-2">
+          <h2 class="text-sm font-semibold truncate">${s.name}</h2>
+          <a href="${linkUrl}" ${s.linkType==="external" ? 'target="_blank"' : ''} 
+            class="block text-center bg-gradient-to-r from-red-600 to-red-700 text-white px-3 py-1.5 rounded-md text-xs font-medium">
+            <i class="fas fa-play"></i> Watch
+          </a>
+        </div>
+      </article>`;
+    }).join('');
+    html += `<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">${cards}</div>`;
+    document.getElementById('match-container').innerHTML = html;
+  });
+</script>
+</body>
+</html>
