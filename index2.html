@@ -42,7 +42,7 @@
   <script>
     const container = document.getElementById('platforms-container');
 
-    fetch(`api.json?nocache=${Date.now()}`)
+    fetch(`https://raw.githubusercontent.com/scoobyff/scoobycricket/main/scooby.json?nocache=${Date.now()}`)
       .then(res => res.json())
       .then(data => {
         if (!Array.isArray(data) || data.length === 0) {
