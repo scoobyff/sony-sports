@@ -196,13 +196,13 @@
         "link": "https://scoobysports.vercel.app/player/bein1my"
       },
       {
-        "name": "TSN F1",
+        "name": "TSN 2 F1",
         "image": "https://raw.githubusercontent.com/scoobyff/tv-logos/main/countries/canada/tsn-2-hd-ca.png",
         "linkType": "external",
         "link": "https://scoobysports.vercel.app/player/tsn2"
       },
       {
-        "name": "TSN F1",
+        "name": "TSN 5 F1",
         "image": "https://raw.githubusercontent.com/scoobyff/tv-logos/main/countries/canada/tsn-5-hd-ca.png",
         "linkType": "external",
         "link": "https://scoobysports.vercel.app/player/tsn5"
