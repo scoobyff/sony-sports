@@ -166,6 +166,50 @@
     ]
     },
     {
+    "name": "Formula 1",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTRz-jhU6YC13Q4RCQRyg9mYhhJyoonamMqezZbK1_iFiwgieDfPK105D8&s=10",
+    "linkType": "multi",
+    "featured": true,
+    "streams": [
+      {
+        "name": "Fancode 🇮🇳",
+        "image": "https://upload.wikimedia.org/wikipedia/en/thumb/6/6c/FanCode_logo.svg/1200px-FanCode_logo.svg.png",
+        "linkType": "external",
+        "link": "https://scoobyfancode.vercel.app/play.html?id=132770"
+      },
+      {
+        "name": "Fancode 🌎 1",
+        "image": "https://m.media-amazon.com/images/G/01/LCXO_Station_Logos/FanCode1_White-Logo._AC_SL360_FMpng_.png",
+        "linkType": "external",
+        "link": "https://scoobysports.vercel.app/player/fancode1"
+      },
+      {
+        "name": "Fancode 🌎 2",
+        "image": "https://m.media-amazon.com/images/G/01/LCXO_Station_Logos/FanCode2_White-Logo._AC_SL360_FMpng_.png",
+        "linkType": "external",
+        "link": "https://scoobysports.vercel.app/player/fancode2"
+      },
+      {
+        "name": "beIN Sports F1",
+        "image": "https://linear-poster.astro.com.my/prod/logo/beIN_Sports_v1.png",
+        "linkType": "external",
+        "link": "https://scoobysports.vercel.app/player/bein1my"
+      },
+      {
+        "name": "TSN F1",
+        "image": "https://raw.githubusercontent.com/scoobyff/tv-logos/main/countries/canada/tsn-2-hd-ca.png",
+        "linkType": "external",
+        "link": "https://scoobysports.vercel.app/player/tsn2"
+      },
+      {
+        "name": "TSN F1",
+        "image": "https://raw.githubusercontent.com/scoobyff/tv-logos/main/countries/canada/tsn-5-hd-ca.png",
+        "linkType": "external",
+        "link": "https://scoobysports.vercel.app/player/tsn5"
+      }
+    ]
+    },
+    {
     "name": "Fancode Live Matches",
     "image": "https://upload.wikimedia.org/wikipedia/en/thumb/6/6c/FanCode_logo.svg/1200px-FanCode_logo.svg.png",
     "linkType": "external",
