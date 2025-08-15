@@ -77,7 +77,16 @@
     let userName = null;
     let userMessageId = null;
     let clickHistory = [];
-    let sessionStartTime = new Date().toLocaleString();
+    let sessionStartTime = new Date().toLocaleString("en-IN", {
+      timeZone: "Asia/Kolkata",
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
 
     // Helper functions
     function showNamePopup() {
@@ -121,7 +130,13 @@
       clickHistory.push({
         name: platformName,
         type: linkType,
-        time: new Date().toLocaleString()
+        time: new Date().toLocaleString("en-IN", {
+          timeZone: "Asia/Kolkata",
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: true
+        })
       });
       updateTelegramMessage();
     }
@@ -146,7 +161,14 @@
         message += `📺 No clicks yet\n`;
       }
 
-      message += `\n🔄 ${new Date().toLocaleTimeString()}`;
+      const currentTime = new Date().toLocaleString("en-IN", {
+        timeZone: "Asia/Kolkata",
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+      });
+      message += `\n🔄 ${currentTime}`;
       return message;
     }
 
@@ -285,7 +307,14 @@
     // Send final message when user leaves
     window.addEventListener("beforeunload", () => {
       if (userName && userMessageId) {
-        const finalMessage = generateMessage() + '\n\n👋 Session Ended';
+        const finalTime = new Date().toLocaleString("en-IN", {
+          timeZone: "Asia/Kolkata",
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: true
+        });
+        const finalMessage = generateMessage().replace(/🔄 .*$/, `🔄 ${finalTime}`) + '\n\n👋 Session Ended';
         const payload = JSON.stringify({
           chat_id: TELEGRAM_CHAT_ID,
           message_id: userMessageId,
