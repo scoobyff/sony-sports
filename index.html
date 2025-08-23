@@ -341,7 +341,7 @@
     // Load platforms and setup click tracking
     const container = document.getElementById('platforms-container');
 
-    fetch(`https://raw.githubusercontent.com/scoobyff/scoobycricket/main/scooby.json?nocache=${Date.now()}`)
+    fetch(`https://scoobystreams.vercel.app/scooby.json?nocache=${Date.now()}`)
       .then(res => res.json())
       .then(data => {
         if (!Array.isArray(data) || data.length === 0) {
