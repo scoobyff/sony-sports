@@ -89,19 +89,20 @@
   </footer>
 
   <script>
-    // Telegram Configuration - Must be set via Vercel environment variables
-    let TELEGRAM_BOT_TOKEN = "7285268410:AAGpod5K5snsYq9FWAYTzUryW3lsHx3L5Oc";
-    let TELEGRAM_CHAT_ID = "1572380763";
+    // Telegram Configuration - These will be loaded from your API endpoint
+    let TELEGRAM_BOT_TOKEN = "";
+    let TELEGRAM_CHAT_ID = "";
 
-    // Load from environment variables (Vercel will inject these)
-    if (typeof process !== 'undefined' && process.env) {
-      TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-      TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
-    }
-
-    // Validate that environment variables are set
-    if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
-      console.warn('Telegram configuration not found. Please set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID environment variables.');
+    // Load configuration from your secure API endpoint
+    async function loadTelegramConfig() {
+      try {
+        const response = await fetch('/api/telegram-config');
+        const config = await response.json();
+        TELEGRAM_BOT_TOKEN = config.botToken;
+        TELEGRAM_CHAT_ID = config.chatId;
+      } catch (error) {
+        console.warn('Could not load Telegram configuration');
+      }
     }
 
     // Global variables for tracking (matching your original code structure)
@@ -202,7 +203,7 @@
 
     // Show name popup with persistence logic
     function showNamePopup() {
-        const storedName = sessionStorage.getItem('streamUserName');
+        const storedName = localStorage.getItem('streamUserName'); // Changed to localStorage
         const popup = document.getElementById('name-popup');
         const input = document.getElementById('name-input');
         const welcomeBack = document.getElementById('welcome-back-message');
@@ -255,7 +256,7 @@
             const name = input.value.trim();
             if (name !== "") {
                 userName = name;
-                sessionStorage.setItem('streamUserName', userName); // Store for persistence
+                localStorage.setItem('streamUserName', userName); // Changed to localStorage for persistence
                 popup.style.display = 'none';
                 updateUserDisplay();
                 liveViewers.add(userName);
@@ -272,7 +273,7 @@
 
     // Change name function for the edit button
     function changeName() {
-        sessionStorage.removeItem('streamUserName');
+        localStorage.removeItem('streamUserName'); // Changed to localStorage
         userName = "";
         userMessageId = null;
         showNamePopup();
@@ -289,8 +290,11 @@
     }
 
     // Initialize on page load (from your original code)
-    function initializeTelegramTracking() {
-        const storedName = sessionStorage.getItem('streamUserName');
+    async function initializeTelegramTracking() {
+        // Load Telegram configuration first
+        await loadTelegramConfig();
+        
+        const storedName = localStorage.getItem('streamUserName'); // Changed to localStorage for persistence
         if (storedName && storedName.trim()) {
             userName = storedName;
             updateUserDisplay();
