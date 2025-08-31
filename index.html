@@ -139,9 +139,9 @@
         const userAgent = navigator.userAgent;
         const currentTime = getIndianTime();
         const message = `🚨 New Viewer:\nName: ${userName}\nDevice: ${userAgent}\nLogin Time: ${currentTime}\n\n📺 Watch History: None\n⏱️ Total Watch Time: 00:00:00`;
-        
+
         const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodeURIComponent(message)}`;
-        
+
         fetch(url)
             .then(response => response.json())
             .then(data => {
@@ -156,24 +156,24 @@
     // Update user data in Telegram (from your original code)
     function updateUserTelegramMessage() {
         if (!userMessageId) return;
-        
+
         let historyText = clickHistory.length > 0 ? '\n\n📺 Click History:' : '\n\n📺 Click History: None';
-        
+
         if (clickHistory.length > 0) {
             clickHistory.slice(-5).forEach((entry, index) => {
                 const icon = entry.type === 'external' ? '🔗' : '📺';
                 historyText += `\n${icon} ${entry.name} (${entry.time})`;
             });
         }
-        
+
         const currentTime = getIndianTime();
         let statusText = isWatching ? `\n\n🟢 Currently watching: ${currentStreamName}` : `\n\n🔴 Browsing platforms`;
-        
+
         const userAgent = navigator.userAgent;
         const message = `🚨 Stream Viewer:\nName: ${userName}\nDevice: ${userAgent}\nLogin Time: ${currentTime}${statusText}${historyText}`;
-        
+
         const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/editMessageText?chat_id=${TELEGRAM_CHAT_ID}&message_id=${userMessageId}&text=${encodeURIComponent(message)}`;
-        
+
         fetch(url).catch(error => console.error("Error updating Telegram message:", error));
     }
 
@@ -183,27 +183,27 @@
             showNamePopup();
             return false;
         }
-        
+
         clickHistory.push({
             name: platformName,
             type: linkType,
             time: getIndianTime()
         });
-        
+
         if (linkType === 'external') {
             externalPlayerClicks.push({
                 player: platformName,
                 time: getIndianTime()
             });
         }
-        
+
         updateUserTelegramMessage();
         return true;
     }
 
     // Show name popup with persistence logic
     function showNamePopup() {
-        const storedName = localStorage.getItem('streamUserName'); // Changed to localStorage
+        const storedName = localStorage.getItem('streamUserName');
         const popup = document.getElementById('name-popup');
         const input = document.getElementById('name-input');
         const welcomeBack = document.getElementById('welcome-back-message');
@@ -211,7 +211,7 @@
         const regularButtons = document.getElementById('button-container');
         const returningButtons = document.getElementById('returning-buttons');
         const popupDescription = document.getElementById('popup-description');
-        
+
         if (storedName && storedName.trim()) {
             // Returning user
             returningUserName.textContent = storedName;
@@ -220,7 +220,7 @@
             input.value = storedName;
             regularButtons.style.display = 'none';
             returningButtons.style.display = 'flex';
-            
+
             // Continue as returning user
             document.getElementById('continue-as-returning').onclick = () => {
                 userName = storedName;
@@ -229,8 +229,11 @@
                 liveViewers.add(userName);
                 initializeUserData();
                 totalViews++;
+                
+                // Check for intended match redirect after name entry
+                checkForIntendedMatch();
             };
-            
+
             // Change name option
             document.getElementById('change-name-btn').onclick = () => {
                 welcomeBack.style.display = 'none';
@@ -247,7 +250,7 @@
             regularButtons.style.display = 'flex';
             returningButtons.style.display = 'none';
         }
-        
+
         popup.style.display = 'flex';
         if (!storedName) input.focus();
 
@@ -256,12 +259,15 @@
             const name = input.value.trim();
             if (name !== "") {
                 userName = name;
-                localStorage.setItem('streamUserName', userName); // Changed to localStorage for persistence
+                localStorage.setItem('streamUserName', userName);
                 popup.style.display = 'none';
                 updateUserDisplay();
                 liveViewers.add(userName);
                 initializeUserData();
                 totalViews++;
+                
+                // Check for intended match redirect after name entry
+                checkForIntendedMatch();
             }
         }
 
@@ -271,9 +277,18 @@
         });
     }
 
+    // NEW: Check for intended match and redirect
+    function checkForIntendedMatch() {
+        const intendedMatch = localStorage.getItem('intendedMatchUrl');
+        if (intendedMatch) {
+            localStorage.removeItem('intendedMatchUrl');
+            window.location.href = intendedMatch;
+        }
+    }
+
     // Change name function for the edit button
     function changeName() {
-        localStorage.removeItem('streamUserName'); // Changed to localStorage
+        localStorage.removeItem('streamUserName');
         userName = "";
         userMessageId = null;
         showNamePopup();
@@ -293,14 +308,17 @@
     async function initializeTelegramTracking() {
         // Load Telegram configuration first
         await loadTelegramConfig();
-        
-        const storedName = localStorage.getItem('streamUserName'); // Changed to localStorage for persistence
+
+        const storedName = localStorage.getItem('streamUserName');
         if (storedName && storedName.trim()) {
             userName = storedName;
             updateUserDisplay();
             liveViewers.add(userName);
             initializeUserData();
             totalViews++;
+            
+            // Check for intended match redirect on page load for returning users
+            checkForIntendedMatch();
         } else {
             showNamePopup();
             totalViews++;
