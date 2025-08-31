@@ -10,37 +10,68 @@
 <body class="bg-black text-white">
 <main class="container mx-auto px-4 py-6" id="match-container"></main>
 <script>
-const params = new URLSearchParams(window.location.search);
-const matchName = params.get("name");
-fetch(`https://raw.githubusercontent.com/scoobyff/scoobycricket/main/scooby.json?nocache=${Date.now()}`)
-  .then(res => res.json())
-  .then(data => {
-    const match = data.find(m => m.name === matchName);
-    if (!match || !Array.isArray(match.streams)) {
-      document.getElementById('match-container').innerHTML = `<p>No streams found.</p>`;
-      return;
-    }
-    let html = `<section class="mb-6"><img src="${match.image}" class="w-full rounded-lg shadow-lg"></section>`;
-    const cards = match.streams.map(s => {
-      let linkUrl = "#";
-      if (s.linkType === "external") linkUrl = s.link;
-      else if (s.linkType === "internal") linkUrl = `play.html?${new URLSearchParams(s).toString()}`;
-      return `<article class="platform-card w-full h-[200px] bg-gray-900 rounded-lg overflow-hidden flex flex-col">
-        <div class="aspect-video flex items-center justify-center bg-black flex-grow">
-          <img src="${s.image}" alt="${s.name}" class="max-w-[70%] max-h-[70%] object-contain p-2">
-        </div>
-        <div class="p-3 space-y-2 flex flex-col justify-between flex-shrink-0">
-          <h2 class="text-sm font-semibold truncate">${s.name}</h2>
-          <a href="${linkUrl}" ${s.linkType==="external" ? 'target="_blank"' : ''} 
-            class="block text-center bg-gradient-to-r from-red-600 to-red-700 text-white px-3 py-1.5 rounded-md text-xs font-medium">
-            <i class="fas fa-play"></i> Watch
-          </a>
-        </div>
-      </article>`;
-    }).join('');
-    html += `<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">${cards}</div>`;
-    document.getElementById('match-container').innerHTML = html;
-  });
+// Check if user came from the main site or accessed directly
+function checkUserAccess() {
+  const params = new URLSearchParams(window.location.search);
+  const matchName = params.get("name");
+  
+  // Get the referrer (where the user came from)
+  const referrer = document.referrer;
+  const isFromMainSite = referrer.includes('scoobysport.vercel.app');
+  
+  // If user accessed directly (not from main site) and there's a match name, redirect
+  if (!isFromMainSite && matchName) {
+    // Store the intended match URL to return to after name entry
+    localStorage.setItem('intendedMatchUrl', window.location.href);
+    window.location.href = 'https://scoobysport.vercel.app/';
+    return false;
+  }
+  
+  return true;
+}
+
+// Main function to load match data
+function loadMatch() {
+  if (!checkUserAccess()) {
+    return; // Don't load if redirecting
+  }
+  
+  const params = new URLSearchParams(window.location.search);
+  const matchName = params.get("name");
+  
+  fetch(`https://raw.githubusercontent.com/scoobyff/scoobycricket/main/scooby.json?nocache=${Date.now()}`)
+    .then(res => res.json())
+    .then(data => {
+      const match = data.find(m => m.name === matchName);
+      if (!match || !Array.isArray(match.streams)) {
+        document.getElementById('match-container').innerHTML = `<p>No streams found.</p>`;
+        return;
+      }
+      let html = `<section class="mb-6"><img src="${match.image}" class="w-full rounded-lg shadow-lg"></section>`;
+      const cards = match.streams.map(s => {
+        let linkUrl = "#";
+        if (s.linkType === "external") linkUrl = s.link;
+        else if (s.linkType === "internal") linkUrl = `play.html?${new URLSearchParams(s).toString()}`;
+        return `<article class="platform-card w-full h-[200px] bg-gray-900 rounded-lg overflow-hidden flex flex-col">
+          <div class="aspect-video flex items-center justify-center bg-black flex-grow">
+            <img src="${s.image}" alt="${s.name}" class="max-w-[70%] max-h-[70%] object-contain p-2">
+          </div>
+          <div class="p-3 space-y-2 flex flex-col justify-between flex-shrink-0">
+            <h2 class="text-sm font-semibold truncate">${s.name}</h2>
+            <a href="${linkUrl}" ${s.linkType==="external" ? 'target="_blank"' : ''} 
+              class="block text-center bg-gradient-to-r from-red-600 to-red-700 text-white px-3 py-1.5 rounded-md text-xs font-medium">
+              <i class="fas fa-play"></i> Watch
+            </a>
+          </div>
+        </article>`;
+      }).join('');
+      html += `<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">${cards}</div>`;
+      document.getElementById('match-container').innerHTML = html;
+    });
+}
+
+// Load the match when page loads
+loadMatch();
 </script>
 </body>
 </html>
