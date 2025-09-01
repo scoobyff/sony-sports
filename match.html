@@ -39,7 +39,7 @@ function loadMatch() {
   const params = new URLSearchParams(window.location.search);
   const matchName = params.get("name");
   
-  fetch(`https://raw.githubusercontent.com/scoobyff/scoobycricket/main/scooby.json?nocache=${Date.now()}`)
+  fetch(`https://raw.githubusercontent.com/scoobyff/scoobycricket/main/ascooby.json?nocache=${Date.now()}`)
     .then(res => res.json())
     .then(data => {
       const match = data.find(m => m.name === matchName);
