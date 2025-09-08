@@ -17,7 +17,7 @@ function checkUserAccess() {
   
   // Get the referrer (where the user came from)
   const referrer = document.referrer;
-  const isFromMainSite = referrer.includes('scoobysport.vercel.app');
+  const isFromMainSite = referrer.includes('scooby-sport.vercel.app');
   
   // If user accessed directly (not from main site) and there's a match name, redirect
   if (!isFromMainSite && matchName) {
