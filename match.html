@@ -98,19 +98,15 @@ function loadMatch() {
         }
         
         return `
-          <article class="platform-card w-full bg-gray-900 rounded-lg overflow-hidden flex flex-col">
-            <div class="aspect-video flex items-center justify-center bg-black">
-              <img src="${stream.image}" 
-                   alt="${stream.name}" 
-                   class="max-w-[70%] max-h-[70%] object-contain p-2"
-                   onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzMzMzMzMyIvPjx0ZXh0IHg9IjUwIiB5PSI1NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSIjNjY2NjY2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5UVjwvdGV4dD48L3N2Zz4='">
+          <article class="platform-card w-full max-w-[160px] sm:max-w-[180px] h-[200px] bg-gray-900 rounded-lg overflow-hidden flex flex-col">
+            <div class="aspect-video flex items-center justify-center bg-black flex-grow">
+              <img src="${stream.image}" alt="${stream.name}" class="max-w-[70%] max-h-[70%] object-contain p-2">
             </div>
-            <div class="p-3 space-y-2">
-              <h3 class="text-sm font-semibold truncate text-gray-100">${stream.name}</h3>
-              <a href="${linkUrl}" 
-                 ${stream.linkType === "external" ? 'target="_blank" rel="noopener noreferrer"' : ''} 
-                 class="block text-center bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-3 py-1.5 rounded-md text-xs font-medium transition-colors">
-                <i class="fas fa-play mr-1"></i>Watch
+            <div class="p-3 space-y-2 flex flex-col justify-between flex-shrink-0">
+              <h2 class="text-sm font-semibold truncate">${stream.name}</h2>
+              <a href="${linkUrl}" ${stream.linkType==="external" ? 'target="_blank"' : ''} 
+                class="block text-center bg-gradient-to-r from-red-600 to-red-700 text-white px-3 py-1.5 rounded-md text-xs font-medium">
+                <i class="fas fa-play"></i> Watch
               </a>
             </div>
           </article>`;
