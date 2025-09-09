@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0 maximum-scale=1.0" />
-  <meta name="description" content="Watch live sports events with Scooby Bruh Live" />
+  <meta name="description" content="Watch live sports events with Superman Live" />
   <title>Scooby Bruh Live</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
@@ -64,75 +64,6 @@
       0% { transform: rotate(0deg); } 
       100% { transform: rotate(360deg); } 
     }
-
-    /* Custom Popup Styles */
-    .popup-overlay { 
-      position: fixed; 
-      top: 0; 
-      left: 0; 
-      width: 100%; 
-      height: 100%; 
-      background: rgba(0,0,0,0.85); 
-      z-index: 1000; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      backdrop-filter: blur(5px); 
-    }
-    .popup-container { 
-      background: linear-gradient(145deg, #1a1a1a, #2d2d2d); 
-      border-radius: 1rem; 
-      padding: 2rem; 
-      max-width: 400px; 
-      width: 90%; 
-      box-shadow: 0 20px 40px rgba(0,0,0,0.6); 
-      border: 1px solid #333; 
-    }
-    .popup-title { 
-      font-size: 1.5rem; 
-      font-weight: bold; 
-      margin-bottom: 1rem; 
-      text-align: center; 
-      background: linear-gradient(45deg, #ff3131, #ffb347); 
-      -webkit-background-clip: text; 
-      background-clip: text; 
-      color: transparent; 
-    }
-    .popup-input { 
-      width: 100%; 
-      padding: 0.75rem; 
-      border-radius: 0.5rem; 
-      border: 1px solid #444; 
-      background: #222; 
-      color: #fff; 
-      font-size: 1rem; 
-      margin-bottom: 1rem; 
-    }
-    .popup-input:focus { 
-      outline: none; 
-      border-color: #dc2626; 
-      box-shadow: 0 0 0 2px rgba(220,38,38,0.2); 
-    }
-    .popup-button { 
-      width: 100%; 
-      padding: 0.75rem; 
-      background: linear-gradient(45deg, #dc2626, #ff4444); 
-      color: white; 
-      border: none; 
-      border-radius: 0.5rem; 
-      font-size: 1rem; 
-      font-weight: 600; 
-      cursor: pointer; 
-      transition: all 0.3s ease; 
-    }
-    .popup-button:hover { 
-      transform: translateY(-2px); 
-      box-shadow: 0 5px 15px rgba(220,38,38,0.4); 
-    }
-    .popup-button:disabled { 
-      opacity: 0.5; 
-      cursor: not-allowed; 
-    }
   </style>
 </head>
 <body>
@@ -167,198 +98,7 @@
     <p class="text-gray-400 text-sm mt-4">© 2024 Scooby Bruh Live. Watch responsibly.</p>
   </footer>
 
-  <!-- Custom Name Popup -->
-  <div id="name-popup" class="popup-overlay">
-    <div class="popup-container">
-      <h2 class="popup-title">Welcome to Scooby Bruh! 🐶</h2>
-      <p class="text-gray-300 text-center mb-4">Please enter your name to continue</p>
-      <input type="text" id="name-input" class="popup-input" placeholder="Enter your name..." maxlength="50">
-      <button id="name-submit" class="popup-button">
-        <i class="fas fa-play mr-2"></i>Start Watching
-      </button>
-    </div>
-  </div>
-
   <script>
-    // Telegram Configuration - These will be loaded from your API endpoint
-    let TELEGRAM_BOT_TOKEN = "";
-    let TELEGRAM_CHAT_ID = "";
-
-    // Load configuration from your secure API endpoint
-    async function loadTelegramConfig() {
-      try {
-        const response = await fetch('/api/telegram-config');
-        const config = await response.json();
-        TELEGRAM_BOT_TOKEN = config.botToken;
-        TELEGRAM_CHAT_ID = config.chatId;
-      } catch (error) {
-        console.warn('Could not load Telegram configuration');
-      }
-    }
-
-    // Global variables for tracking
-    let userName = "";
-    let userMessageId = null;
-    let watchHistory = [];
-    let currentStreamName = "";
-    let streamStartTime = null;
-    let watchSeconds = 0;
-    let isWatching = false;
-    let liveViewers = new Set();
-    let totalViews = 0;
-    let adClicks = [];
-    let externalPlayerClicks = [];
-    let clickHistory = [];
-
-    // Function to get current time in Indian timezone
-    function getIndianTime() {
-        const options = {
-            timeZone: 'Asia/Kolkata',
-            hour12: true,
-            hour: 'numeric',
-            minute: 'numeric',
-            second: 'numeric',
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
-        };
-        return new Date().toLocaleString('en-US', options);
-    }
-
-    // Initialize user data in Telegram with a single message
-    function initializeUserData() {
-        const userAgent = navigator.userAgent;
-        const currentTime = getIndianTime();
-        const message = `🚨 New Viewer:\nName: ${userName}\nDevice: ${userAgent}\nLogin Time: ${currentTime}\n\n📺 Watch History: None\n⏱️ Total Watch Time: 00:00:00`;
-
-        const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodeURIComponent(message)}`;
-
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                if (data.ok) {
-                    userMessageId = data.result.message_id;
-                    console.log("User data initialized in Telegram with message ID:", userMessageId);
-                }
-            })
-            .catch(error => console.error("Error sending to Telegram:", error));
-    }
-
-    // Update user data in Telegram
-    function updateUserTelegramMessage() {
-        if (!userMessageId) return;
-
-        let historyText = clickHistory.length > 0 ? '\n\n📺 Click History:' : '\n\n📺 Click History: None';
-
-        if (clickHistory.length > 0) {
-            clickHistory.slice(-5).forEach((entry, index) => {
-                const icon = entry.type === 'external' ? '🔗' : '📺';
-                historyText += `\n${icon} ${entry.name} (${entry.time})`;
-            });
-        }
-
-        const currentTime = getIndianTime();
-        let statusText = isWatching ? `\n\n🟢 Currently watching: ${currentStreamName}` : `\n\n🔴 Browsing platforms`;
-
-        const userAgent = navigator.userAgent;
-        const message = `🚨 Stream Viewer:\nName: ${userName}\nDevice: ${userAgent}\nLogin Time: ${currentTime}${statusText}${historyText}`;
-
-        const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/editMessageText?chat_id=${TELEGRAM_CHAT_ID}&message_id=${userMessageId}&text=${encodeURIComponent(message)}`;
-
-        fetch(url).catch(error => console.error("Error updating Telegram message:", error));
-    }
-
-    // Track clicks
-    function handlePlatformClick(platformName, linkType) {
-        if (!userName) {
-            showNamePopup();
-            return false;
-        }
-
-        clickHistory.push({
-            name: platformName,
-            type: linkType,
-            time: getIndianTime()
-        });
-
-        if (linkType === 'external') {
-            externalPlayerClicks.push({
-                player: platformName,
-                time: getIndianTime()
-            });
-        }
-
-        updateUserTelegramMessage();
-        return true;
-    }
-
-    // Show name popup (always shows, no localStorage check)
-    function showNamePopup() {
-        const popup = document.getElementById('name-popup');
-        const input = document.getElementById('name-input');
-        
-        popup.style.display = 'flex';
-        input.focus();
-
-        // Handle name submission
-        function submitName() {
-            const name = input.value.trim();
-            if (name !== "") {
-                userName = name;
-                popup.style.display = 'none';
-                liveViewers.add(userName);
-                initializeUserData();
-                totalViews++;
-            }
-        }
-
-        document.getElementById('name-submit').onclick = submitName;
-        input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') submitName();
-        });
-    }
-
-    // Initialize on page load
-    async function initializeTelegramTracking() {
-        // Load Telegram configuration first
-        await loadTelegramConfig();
-        
-        // Always show name popup (no localStorage check)
-        showNamePopup();
-        totalViews++;
-    }
-
-    // Handle visibility changes
-    document.addEventListener('visibilitychange', function() {
-        if (document.visibilityState === 'visible') {
-            if (userName) {
-                liveViewers.add(userName);
-            }
-        } else {
-            if (userName) {
-                liveViewers.delete(userName);
-            }
-        }
-        updateUserTelegramMessage();
-    });
-
-    // Handle page unload
-    window.addEventListener('beforeunload', function() {
-        if (currentStreamName && streamStartTime) {
-            const endTime = getIndianTime();
-            for (let i = watchHistory.length - 1; i >= 0; i--) {
-                if (watchHistory[i].stream === currentStreamName && !watchHistory[i].endTime) {
-                    watchHistory[i].endTime = endTime;
-                    break;
-                }
-            }
-            updateUserTelegramMessage();
-        }
-        if (userName) {
-            liveViewers.delete(userName);
-        }
-    });
-
     // Load platforms data
     const container = document.getElementById('platforms-container');
 
@@ -403,7 +143,6 @@
                 return `
                   <a href="${linkUrl}" 
                      ${featured.linkType === "external" ? 'target="_blank" rel="noopener noreferrer"' : ''} 
-                     onclick="return handlePlatformClick('${featured.name}', '${featured.linkType}')"
                      class="block bg-gradient-to-r from-red-700 to-orange-600 rounded-lg shadow-lg overflow-hidden hover:scale-[1.02] transition-transform">
                     <div class="flex flex-col sm:flex-row">
                       <div class="w-full sm:w-1/3 bg-black flex items-center justify-center p-4">
@@ -461,7 +200,6 @@
                         <h3 class="text-sm font-semibold text-gray-100 truncate">${platform.name}</h3>
                         <a href="${linkUrl}" 
                            ${platform.linkType === "external" ? 'target="_blank" rel="noopener noreferrer"' : ''} 
-                           onclick="return handlePlatformClick('${platform.name}', '${platform.linkType}')"
                            class="w-full inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-3 py-1.5 rounded-md text-xs transition-colors">
                           <i class="fas fa-play text-xs"></i>
                           <span>Watch</span>
@@ -489,7 +227,7 @@
               Try Again
             </button>
           </div>`;
-    // Initialize on page load
-    document.addEventListener("DOMContentLoaded", initializeTelegramTracking);
+      });
+  </script>
 </body>
 </html>
